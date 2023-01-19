@@ -1,3 +1,5 @@
+
+
 const db = require("../models");
 const Tutorial = db.tutorials;
 const Op = db.Sequelize.Op;
@@ -67,8 +69,6 @@ exports.findOne = (req, res) => {
 
 // Buscar IMEI
 exports.findOneImei = async (req, res) => {
-
-
 
     const enteredName = req.params.id;
     console.log("Go " + enteredName)
