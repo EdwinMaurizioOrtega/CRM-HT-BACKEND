@@ -50,20 +50,36 @@ const Op = db.Sequelize.Op;
 // };
 
 // Find a single Tutorial with an id
-exports.findOne = (req, res) => {
+exports.findOne = async (req, res) => {
     const imeiV = req.params.id;
 
-    ValidacionImei.findOne({
-        where: {
-            description: imeiV
-        }
-    }).then(data => {
-        res.send(data);
-    }).catch(err => {
-        res.status(500).send({
-            message: "Error retrieving Tutorial with id=" + id
-        });
-    });
+    const objeto = await ValidacionImei.findOne({where: {description: imeiV}});
+
+    if (objeto === null) {
+        console.log('Not found!');
+        res.send({
+                "validacion": false
+            }
+        )
+    } else {
+       //res.send(objeto);
+        res.send({
+                "validacion": true
+            }
+        )
+    }
+
+    // ValidacionImei.findOne({
+    //     where: {
+    //         description: imeiV
+    //     }
+    // }).then(data => {
+    //     res.send(data);
+    // }).catch(err => {
+    //     res.status(500).send({
+    //         message: "Error retrieving Tutorial with id=" + id
+    //     });
+    // });
 };
 
 
