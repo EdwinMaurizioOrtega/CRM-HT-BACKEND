@@ -1,5 +1,8 @@
-const express = require("express");
-const cors = require("cors");
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+
+import crmRoutes from './app/routes/crm.routes.js';
 
 const app = express();
 
@@ -15,30 +18,21 @@ app.use(express.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
-//Conexión a la base de datos.
-const db = require("./app/models");
-db.sequelize.sync()
-  .then(() => {
-    console.log("Synced db.");
-  })
-  .catch((err) => {
-    console.log("Failed to sync db: " + err.message);
-  });
 
-// // drop the table if it already exists
-// db.sequelize.sync({ force: true }).then(() => {
-//   console.log("Drop and re-sync db.");
-// });
+//API Endpoint
+app.use('/api/crm-ht', crmRoutes);
 
-// simple route
-app.get("/", (req, res) => {
-  res.json({ message: "Bienvenido Hipertronics." });
-});
+app.get('/', (req, res) => {
+  res.send('APP IS RUNNING HIPERTRONICS.');
+})
 
-require("./app/routes/crm.routes")(app);
 
-// set port, listen for requests
-const PORT = process.env.PORT || 80;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
-});
+//const CONNECTION_URL = 'mongodb://localhost:27017/memories';
+const CONNECTION_URL = 'mongodb+srv://hipertronics:81A00ydsLOOGibyK@cluster0.a70yomk.mongodb.net/crmht?retryWrites=true&w=majority';
+const PORT = process.env.PORT|| 80;
+
+mongoose.connect(CONNECTION_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => app.listen(PORT, () => console.log(`Server Running on Port: http://localhost:${PORT}`)))
+    .catch((error) => console.log(`${error} did not connect`));
+
+mongoose.set('useFindAndModify', false);

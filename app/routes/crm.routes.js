@@ -1,36 +1,15 @@
+import express from 'express';
 
-module.exports = app => {
+import { createImei, getImeiByDescription } from '../controllers/ValidacionImei.js';
+import { getGarantia } from '../controllers/WebServicesRemote.js';
 
-  const ValidacionImei = require("../controllers/ValidacionImei.js");
-  const WebServicesRemote = require("../controllers/WebServicesRemote.js");
+const router = express.Router();
 
-  var router = require("express").Router();
+//Logitech
+router.post('/new_imei', createImei);
+router.get('/logitech', getImeiByDescription);
 
-  //API Endpoint
-  app.use("/api/crm-ht", router);
+//HT-BUSINESS
+router.get('/garantia_imei_pac_sap', getGarantia);
 
-
-  // Create a new Tutorial
-  //router.post("/", tutorials.create);
-
-  // Retrieve all Tutorials
-  //router.get("/", tutorials.findAll);
-
-  // Retrieve all published Tutorials
-  //router.get("/published", tutorials.findAllPublished);
-
-  // Retrieve a single Tutorial with id
-  router.get("/logitech/:id", ValidacionImei.findOne);
-
-  // Update a Tutorial with id
-  //router.put("/:id", tutorials.update);
-
-  // Delete a Tutorial with id
-  //router.delete("/:id", tutorials.delete);
-
-  // Delete all Tutorials
-  //router.delete("/", tutorials.deleteAll);
-
-  // Recuperar un detalle de factura con el Imei
-  router.get("/buscarimei/:id", WebServicesRemote.findOneImei);
-};
+export default router;

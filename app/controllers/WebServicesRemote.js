@@ -66,9 +66,9 @@
 
 
 // Buscar IMEI
-exports.findOneImei = async (req, res) => {
+export const getGarantia = async (req, res) => {
 
-    const enteredName = req.params.id;
+    const enteredName = req.query.id;
     console.log("Go " + enteredName)
 
     console.log("IMEI A CONSULTAR: " + enteredName);
