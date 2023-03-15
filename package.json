@@ -1,7 +1,7 @@
 {
   "name": "nodejs-express-sequelize-postgresql",
   "version": "1.0.0",
-  "description": "Node.js Rest Apis with Express, Sequelize & PostgreSQL",
+  "description": "Node.js Rest Apis with Express, HANA DB - SAP",
   "main": "server.js",
   "type": "module",
   "scripts": {
@@ -10,10 +10,12 @@
   "author": "bezkoder",
   "license": "ISC",
   "dependencies": {
+    "@sap/hana-client": "^2.15.22",
+    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "mongoose": "^5.9.29",
-    "body-parser": "^1.19.0"
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.29"
   },
   "devDependencies": {
     "nodemon": "^2.0.6"
