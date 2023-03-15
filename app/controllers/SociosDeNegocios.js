@@ -48,3 +48,23 @@ export const getSociosNegocio = async (req, res) => {
     )
 
 };
+
+
+export const getCondicionPago = async (req, res) => {
+    //Con
+    const SqlQuery = 'SELECT T0.* FROM EC_SBO_LIDENAR.OCTG T0';
+
+    //Funcion para enviar sentencias SQL a la DB HANA
+    consultas(SqlQuery, (err, result) => {
+            if (err) {
+                throw err
+            } else {
+                console.log(result)
+                res.send({
+                    "data": result
+                })
+            }
+        }
+    )
+
+}

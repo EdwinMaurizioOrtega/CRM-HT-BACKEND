@@ -9,8 +9,8 @@ import { getGarantia } from '../controllers/WebServicesRemote.js';
 //import { IniciarSesion, Registrarse } from '../controllers/user.js'
 
 
-//HT-BUSINESS HANADB
-import { getSociosNegocio } from '../controllers/SociosDeNegocios.js';
+//HT-BUSINESS HANA DB
+import { getSociosNegocio, getCondicionPago } from '../controllers/SociosDeNegocios.js';
 
 
 
@@ -25,8 +25,9 @@ router.get('/garantia_imei_pac_sap', getGarantia);
 // router.post("/signin", IniciarSesion);
 // router.post("/signup", Registrarse);
 
-//HT-BUSINESS HANADB
+//HT-BUSINESS HANA DB
 router.get('/socios_de_negocio', getSociosNegocio)
+router.get('/condicion_pago', getCondicionPago)
 
 
 export default router;
