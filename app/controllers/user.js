@@ -1,51 +1,108 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 
-
-import User from "../models/user.js"
+import { SqlQuerySignIn } from "../models/user.js"
+import {consultas} from "../config/HANADB.js";
 
 const router = express.Router();
 
 const secret = ',2023;Hipertronics';
 
 export const IniciarSesion = async (req, res) => {
-    const { usuario, clave } = req.body;
+    const {email, password} = req.body;
 
     try {
-        const oldUser = await User.findOne({ usuario });
 
-        if (!oldUser) return res.status(404).json({ message: "El usuario no existe" });
+        //Sentecia consultar el usuario
+        //const SqlQuery = 'SELECT * FROM "GRUPO_EMPRESARIAL_HT"."ht_users" WHERE "user_login" LIKE \'' + usuario + '\'';
+        const SqlQuery = SqlQuerySignIn(email);
 
-        const isPasswordCorrect = await clave === oldUser.clave;
+        //Funcion para enviar sentencias SQL a la DB HANA
+        consultas(SqlQuery, async (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result)
+                    const oldUser = await result[0];
+                    if (!oldUser) return res.status(404).json({message: "El usuario no existe"});
+                    const isPasswordCorrect = await password === oldUser.PASSWORD;
+                    if (!isPasswordCorrect) return res.status(400).json({message: "Credenciales no válidas"});
+                    const accessToken = jwt.sign({usuario: oldUser.EMAIL, id: oldUser.ID}, secret, {expiresIn: "1h"});
+                    res.status(200).json({user: oldUser, accessToken});
+                }
+            }
+        )
 
-        if (!isPasswordCorrect) return res.status(400).json({ message: "Credenciales no válidas" });
-
-        const token = jwt.sign({ usuario: oldUser.usuario, id: oldUser._id }, secret, { expiresIn: "1h" });
-
-        res.status(200).json({ result: oldUser, token });
     } catch (err) {
-        res.status(500).json({ message: "Algo salió mal" });
+        res.status(500).json({message: "Algo salió mal"});
     }
 };
 
-export const Registrarse = async (req, res) => {
-    const { usuario, clave, nombres } = req.body;
+
+export const MyAccount = async (req, res) => {
+    //const {email, password} = req.body;
 
     try {
-        const oldUser = await User.findOne({ usuario });
 
-        if (oldUser) return res.status(400).json({ message: "El usuario ya existe." });
+        const { authorization } = req.headers;
 
-        //const hashedPassword = await bcrypt.hash(clave, 12);
+        if (!authorization) {
+            return res.status(401).json({
+                message: 'Authorization token missing',
+            });
+        }
 
-        const result = await User.create({ usuario, clave: clave, nombres: `${nombres}` });
+        const accessToken = `${authorization}`.split(' ')[1];
 
-        const token = jwt.sign( { usuario: result.usuario, id: result._id }, secret, { expiresIn: "1h" } );
+        const data = jwt.verify(accessToken, secret);
 
-        res.status(201).json({ result, token });
-    } catch (error) {
-        res.status(500).json({ message: "Algo salió mal." });
+        console.log("data: "+ data );
 
-        console.log(error);
+        const userId = typeof data === 'object' ? data?.id : '';
+
+        // //Sentecia consultar el usuario
+        const SqlQuery = 'SELECT * FROM "GRUPO_EMPRESARIAL_HT"."HT_USERS" WHERE "ID" = '+userId;
+        // const SqlQuery = SqlQuerySignIn(email);
+        //
+        // //Funcion para enviar sentencias SQL a la DB HANA
+        consultas(SqlQuery, async (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result)
+
+                    const oldUser = await result[0];
+
+                    if (!oldUser) return res.status(401).json({message: "Invalid authorization token"});
+
+                    res.status(200).json({user: oldUser});
+                }
+            }
+        )
+
+    } catch (err) {
+        res.status(500).json({message: "Algo salió mal"});
     }
 };
+
+// export const Registrarse = async (req, res) => {
+//     const {usuario, clave, nombres} = req.body;
+//
+//     try {
+//         const oldUser = await User.findOne({usuario});
+//
+//         if (oldUser) return res.status(400).json({message: "El usuario ya existe."});
+//
+//         //const hashedPassword = await bcrypt.hash(clave, 12);
+//
+//         const result = await User.create({usuario, clave: clave, nombres: `${nombres}`});
+//
+//         const token = jwt.sign({usuario: result.usuario, id: result._id}, secret, {expiresIn: "1h"});
+//
+//         res.status(201).json({result, token});
+//     } catch (error) {
+//         res.status(500).json({message: "Algo salió mal."});
+//
+//         console.log(error);
+//     }
+// };

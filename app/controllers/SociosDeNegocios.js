@@ -30,7 +30,7 @@ export const getSociosNegocio = async (req, res) => {
         '      FROM EC_SBO_LIDENAR.OCRD T0\n' +
         '               INNER JOIN EC_SBO_LIDENAR.OCTG T1 ON T0."GroupNum" = T1."GroupNum"\n' +
         '               INNER JOIN EC_SBO_LIDENAR.OCRG T2 ON T2."GroupCode" = T0."GroupCode"\n' +
-        '               INNER JOIN EC_SBO_LIDENAR.CRD1 T3 ON T3."CardCode" = T0."CardCode"\n' +
+        '               INNER JOIN EC_SBO_LIDENAR.CRD1 T3 ON T3."CardCode" = T0."CardCode" AND T3."LineNum" = 0\n' +
         '               INNER JOIN EC_SBO_LIDENAR.OSLP T4 ON T4."SlpCode" = T0."SlpCode") T5\n' +
         'WHERE T5."CardCode" LIKE \''+cedularuc+'\'';
 

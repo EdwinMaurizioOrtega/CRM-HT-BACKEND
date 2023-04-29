@@ -21,6 +21,8 @@ app.use(express.urlencoded({ extended: true }));
 
 //API Endpoint
 app.use('/api/crm-ht', crmRoutes);
+//API Endpoint HANA DB
+app.use('/hanadb', crmRoutes);
 
 app.get('/', (req, res) => {
   res.send('APP IS RUNNING HIPERTRONICS.');
