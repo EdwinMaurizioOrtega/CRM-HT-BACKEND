@@ -11,7 +11,7 @@ import {IniciarSesion, MyAccount} from '../controllers/user.js'
 
 //HT-BUSINESS HANA DB
 import { getSociosNegocio, getCondicionPago } from '../controllers/SociosDeNegocios.js';
-import {getAllProducts, getListPriceByCode, getProduct, getSearchProducts} from '../controllers/Product.js'
+import {getAllProducts, getListPriceByCodeAndUser, getProduct, getSearchProducts} from '../controllers/Product.js'
 
 
 
@@ -29,7 +29,6 @@ router.post("/api/account/login", IniciarSesion);
 router.get("/api/account/my-account", MyAccount);
 // router.post("/signup", Registrarse);
 
-
 //HT-BUSINESS HANA DB | Productos
 router.get('/api/products', getAllProducts)
 //HT-BUSINESS HANA DB | Producto por código
@@ -38,8 +37,7 @@ router.get('/api/products/product', getProduct)
 router.get('/api/products/search', getSearchProducts)
 
 //HT-BUSINESS HANA DB | Lista precios producto
-router.get("/api/products/price_list_product", getListPriceByCode);
-
+router.get("/api/products/price_list_product", getListPriceByCodeAndUser);
 
 //HT-BUSINESS HANA DB | Clientes
 router.get('/socios_de_negocio', getSociosNegocio)

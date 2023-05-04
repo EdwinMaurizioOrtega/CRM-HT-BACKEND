@@ -86,11 +86,12 @@ export const getSearchProducts = async (req, res) => {
 }
 
 
-export const getListPriceByCode = async (req, res) => {
+export const getListPriceByCodeAndUser = async (req, res) => {
 
     //Parametros
     const ItemCode = req.query.name;
-    console.log("Go " + ItemCode)
+    const IdUser = req.query.idUser;
+    console.log("ItemCode: " + ItemCode + " IdUser: "+IdUser)
 
     //Creamos la consulta de Datos Maestros Socios De Negocios
     //const SqlQuery = 'SELECT * FROM EC_SBO_LIDENAR.WEB_HT_PRECIOS T0 WHERE T0."ItemCode" = \'' + ItemCode + '\';';
@@ -98,7 +99,7 @@ export const getListPriceByCode = async (req, res) => {
     const SqlQuery = 'SELECT *\n' +
         'FROM EC_SBO_LIDENAR.WEB_HT_PRECIOS T0\n' +
         '         INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USER_PRICE T1 ON T1.PRICE = T0."PriceList"\n' +
-        'AND T0."ItemCode" = \'' + ItemCode + '\' AND T1.USER = 1;'
+        'AND T0."ItemCode" = \'' + ItemCode + '\' AND T1.USER = \'' + IdUser + '\';'
 
     //Funcion para enviar sentencias SQL a la DB HANA
     consultas(SqlQuery, (err, result) => {
