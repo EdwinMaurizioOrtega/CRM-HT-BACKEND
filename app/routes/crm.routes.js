@@ -15,6 +15,7 @@ import { getSociosNegocio, getCondicionPago } from '../controllers/SociosDeNegoc
 import {getAllProducts, getListPriceByCodeAndUser, getProduct, getSearchProducts} from '../controllers/Product.js'
 // Clientes
 import {getSearchCustomers} from "../controllers/Customer.js";
+import {CreateOrder} from "../controllers/Order.js";
 
 
 
@@ -52,6 +53,9 @@ router.get('/condicion_pago', getCondicionPago)
 
 //HT-BUSINESS HANA DB | Buscar Clientes por el nombre - Razon Social
 router.get('/api/customers/search', getSearchCustomers)
+
+//HT-BUSINESS HANA DB | Orders
+router.post("/api/orders/order", CreateOrder);
 
 
 export default router;
