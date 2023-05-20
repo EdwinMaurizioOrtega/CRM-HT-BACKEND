@@ -54,7 +54,7 @@ router.get('/condicion_pago', getCondicionPago)
 //HT-BUSINESS HANA DB | Buscar Clientes por el nombre - Razon Social
 router.get('/api/customers/search', getSearchCustomers)
 
-//HT-BUSINESS HANA DB | Orders
+//HT-BUSINESS HANA DB | Create Order
 router.post("/api/orders/order", CreateOrder);
 
 
