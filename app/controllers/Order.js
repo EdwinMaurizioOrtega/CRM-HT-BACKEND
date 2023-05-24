@@ -1,38 +1,39 @@
 import {insertOrder} from "../config/HANADB.js";
 import {ParamsOrder, SqlInsertOrder} from "../models/Order.js";
 
-
 export const CreateOrder = async (req, res) => {
+
+    const jsonString = JSON.stringify(req.body);
+    console.log("Arrive JSON: "+jsonString);
+
     try {
 
-        // Si no existe el usuario en la DB procedemos a crearlo
-        const sql = SqlInsertOrder();
-        const params = ParamsOrder(req.body);
-        // insertOrder(sql, params, async (err, result) => {
-        //         if (err) {
-        //             throw err
-        //         } else {
-        //             console.log(result);
-        //             res.send(result);
-        //             //console.log(`Se insertaron ${result} filas`);
-        //
-        //             //Una vez creado con sultamos nuevamente el usuario y enviamos los datos en el response
-        //             // const QueryDos = QuerySearch();
-        //             // consultas(QueryDos, async (err, result) => {
-        //             //         if (err) {
-        //             //             throw err
-        //             //         } else {
-        //             //             const oldUser = await result[0];
-        //             //             const accessToken = jwt.sign({userId: oldUser.ID}, JWT_SECRET, {expiresIn: "1h"});
-        //             //             res.status(200).json({accessToken, user: oldUser});
-        //             //         }
-        //             //     }
-        //             // )
-        //
-        //
-        //         }
-        //     }
-        // )
+        // Orden
+        insertOrder(req.body, async (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result);
+                    res.status(201).send(result);
+                    //console.log(`Se insertaron ${result} filas`);
+
+                    //Una vez creado con sultamos nuevamente el usuario y enviamos los datos en el response
+                    // const QueryDos = QuerySearch();
+                    // consultas(QueryDos, async (err, result) => {
+                    //         if (err) {
+                    //             throw err
+                    //         } else {
+                    //             const oldUser = await result[0];
+                    //             const accessToken = jwt.sign({userId: oldUser.ID}, JWT_SECRET, {expiresIn: "1h"});
+                    //             res.status(200).json({accessToken, user: oldUser});
+                    //         }
+                    //     }
+                    // )
+
+
+                }
+            }
+        )
 
 
     } catch (error) {

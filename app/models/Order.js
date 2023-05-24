@@ -1,4 +1,6 @@
 //Sentecia para crear una nueva orden.
+import {format} from "date-fns";
+
 export const SqlInsertOrder = () => {
     return `INSERT INTO GRUPO_EMPRESARIAL_HT.HT_ORDERS (
       CLIENTEID,
@@ -99,26 +101,29 @@ export const SqlInsertOrder = () => {
   )`;
 };
 
+const dateAll = format(new Date(), 'dd-MM-yyyy HH:mm:ss');
+
+
 export const ParamsOrder = (body) => [
-    body.CLIENTEID || 0,
-    body.ESTADO || 0,
-    body.FECHA || '',
+    body.checkoutData.billing.ID,
+    6,
+    dateAll,
     body.FECHAACTUALIZACION || '',
-    body.FECHACREACION || '',
+    dateAll,
     body.FORMADEPAGO || '',
-    body.GUARDADO || 0,
+    body.GUARDADO || 1,
     body.HORA || '',
     body.LATITUD || 0.00,
     body.LONGITUD || 0.00,
     body.OBSERVACIONES || '',
     body.ONLINE || true,
     body.SUBTOTAL || 0.00,
-    body.TOTAL || 0.00,
+    body.checkoutData.total || 0.00,
     body.TOTALIVA || 0.00,
     body.USUARIOAACTUALIZACION || '',
-    body.VENDEDOR || '',
-    body.VENDEDORID || 0,
-    body.LOCALCLIENTE_ID || 0,
+    body.checkoutUser.DISPLAYNAME || '',
+    body.checkoutUser.ID || 0,
+    body.checkoutData.billing.ID || 0,
     body.EMPRESA || '',
     body.FECHAFACTURACION || '',
     body.NUMEROFACTURAE4 || '',
@@ -139,7 +144,7 @@ export const ParamsOrder = (body) => [
     body.NOMBREUSUARIOENTREGARA || '',
     body.COURIER || '',
     body.USUARIOENTREGABODEGA_ID || 0,
-    body.BODEGA || 0,
+    body.checkoutData.warehouse || 0,
     body.PEDIDOCATEGORIAPROPIA || 0,
     body.IMAGENA || '',
     body.IMAGENB || '',
@@ -147,6 +152,124 @@ export const ParamsOrder = (body) => [
     body.IMAGENGUIA || '',
     body.FECHAAPROBO || '',
     body.DOCNUM || 0];
+
+// Order Detail - Sql
+export const SqlInsertDetailOrder = () => {
+    return `INSERT INTO GRUPO_EMPRESARIAL_HT.HT_ORDERS_DETAIL (
+      CANTIDAD,
+      ESTADO,
+      FACTURAID,
+      FECHAACTUALIZACION,
+      FECHACREACION,
+      OBSERVACIONES,
+      PRECIOUNITARIOVENTA,
+      PRODUCTOID,
+      TIPOPRECIO,
+      TOTAL,
+      USUARIOAACTUALIZACION,
+      PRODUCTO_ID,
+      COMENTARIOPRECIO,
+      COMENTARIOPRODUCTO,
+      COMENTARIO,
+      COMENTARIOSTOCK,
+      EMPRESA,
+      ENTREGADO,
+      TIENESTOCK,
+      NUEVACANTIDAD,
+      PRECIOCOSTO,
+      URL,
+      PROCESADO,
+      DISCOUNTPERCENTSAP,
+      ID_ORDER
+  ) VALUES (
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?
+  )`;
+};
+// Order Detail - Params
+export const ParamsDetailOrder = (body, formaPago, lastIdOrder) => [
+    //Cantidad artículos
+    body.quantity || 0,
+    body.ESTADO || 0,
+    body.FACTURAID || 0,
+    body.FECHAACTUALIZACION || '',
+    dateAll,
+    body.OBSERVACIONES || '',
+    body.PRECIOUNITARIOVENTA || 0.00,
+    body.CODIGO || '',
+    formaPago,
+    // El total.
+    body.subtotal || 0.00,
+    body.USUARIOAACTUALIZACION || '',
+    // Código del producto
+    body.CODIGO || '',
+    body.COMENTARIOPRECIO || '',
+    body.COMENTARIOPRODUCTO || '',
+    body.COMENTARIO || '',
+    body.COMENTARIOSTOCK || '',
+    'LID',
+    body.ENTREGADO || false,
+    body.TIENESTOCK || 0,
+    body.NUEVACANTIDAD || 0,
+    body.PRECIOCOSTO || 0.00,
+    body.URL || '',
+    body.PROCESADO || true,
+    body.DISCOUNTPERCENTSAP || 0,
+    lastIdOrder];
+
+
+export const ParamsEnvioDetailOrder = (totalEnvio, ivaEnvio, subTotalEnvio, codProducto, formaPago, lastIdOrder) => [
+    //Cantidad artículos
+    1,
+    0,
+    0,
+    '',
+    dateAll,
+    '',
+    0.00,
+    codProducto,
+    formaPago || '',
+    // El total.
+    subTotalEnvio || 0.00,
+    '',
+    // Código del producto
+    codProducto || '',
+    '',
+    '',
+    '',
+    '',
+    'LID',
+    false,
+    0,
+    0,
+    0.00,
+    '',
+    true,
+    0,
+    lastIdOrder];
 
 
 // export const QuerySearch = () => `SELECT U.*
