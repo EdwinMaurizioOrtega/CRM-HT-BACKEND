@@ -1,13 +1,12 @@
-import {insertOrder} from "../config/HANADB.js";
-import {ParamsOrder, SqlInsertOrder} from "../models/Order.js";
+import {consultas, insertOrder} from "../config/HANADB.js";
+import {ParamsOrder, SqlGetAllOrders, SqlInsertOrder} from "../models/Order.js";
 
 export const CreateOrder = async (req, res) => {
 
     const jsonString = JSON.stringify(req.body);
-    console.log("Arrive JSON: "+jsonString);
+    console.log("Arrive JSON: " + jsonString);
 
     try {
-
         // Orden
         insertOrder(req.body, async (err, result) => {
                 if (err) {
@@ -15,22 +14,6 @@ export const CreateOrder = async (req, res) => {
                 } else {
                     console.log(result);
                     res.status(201).send(result);
-                    //console.log(`Se insertaron ${result} filas`);
-
-                    //Una vez creado con sultamos nuevamente el usuario y enviamos los datos en el response
-                    // const QueryDos = QuerySearch();
-                    // consultas(QueryDos, async (err, result) => {
-                    //         if (err) {
-                    //             throw err
-                    //         } else {
-                    //             const oldUser = await result[0];
-                    //             const accessToken = jwt.sign({userId: oldUser.ID}, JWT_SECRET, {expiresIn: "1h"});
-                    //             res.status(200).json({accessToken, user: oldUser});
-                    //         }
-                    //     }
-                    // )
-
-
                 }
             }
         )
@@ -43,6 +26,38 @@ export const CreateOrder = async (req, res) => {
         });
     }
 };
+
+export const getAllOrders = async (req, res) => {
+
+    try {
+
+        //Sin Parametros
+        //Creamos la consulta
+        const SqlQuery = SqlGetAllOrders(6)
+
+        //Funcion para enviar sentencias SQL a la DB HANA
+        consultas(SqlQuery, (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result)
+                    res.send({
+                        "orders": result
+                    })
+                }
+            }
+        )
+
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+
+}
 
 // CREATE TABLE GRUPO_EMPRESARIAL_HT.ht_orders
 // (

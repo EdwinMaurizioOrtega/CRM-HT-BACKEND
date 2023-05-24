@@ -122,6 +122,7 @@ export function insertOrder(body, callback) {
                 const sqlEnvio = SqlInsertDetailOrder();
 
                 let totalEnvio = body.checkoutData.shipping;
+                let commentEnvio = body.checkoutData.comment;
                 let ivaEnvio = 0
                 let subTotalEnvio =0
                 let codProducto = ''
@@ -158,7 +159,7 @@ export function insertOrder(body, callback) {
                         codProducto;
                 }
 
-                const paramsEnvio = ParamsEnvioDetailOrder(totalEnvio, ivaEnvio, subTotalEnvio, codProducto, formaPago, lastIdOrder);
+                const paramsEnvio = ParamsEnvioDetailOrder(totalEnvio, ivaEnvio, subTotalEnvio, codProducto, formaPago, commentEnvio, lastIdOrder);
 
                 // Ejemplo de inserción de datos de envio
                 conn.exec(sqlEnvio, paramsEnvio, (insertErr, affectedRows) => {

@@ -117,9 +117,9 @@ export const ParamsOrder = (body) => [
     body.LONGITUD || 0.00,
     body.OBSERVACIONES || '',
     body.ONLINE || true,
-    body.SUBTOTAL || 0.00,
+    body.checkoutData.subtotal || 0.00,
     body.checkoutData.total || 0.00,
-    body.TOTALIVA || 0.00,
+    body.checkoutData.iva || 0.00,
     body.USUARIOAACTUALIZACION || '',
     body.checkoutUser.DISPLAYNAME || '',
     body.checkoutUser.ID || 0,
@@ -226,7 +226,7 @@ export const ParamsDetailOrder = (body, formaPago, lastIdOrder) => [
     body.USUARIOAACTUALIZACION || '',
     // Código del producto
     body.CODIGO || '',
-    body.COMENTARIOPRECIO || '',
+    body.comment || '',
     body.COMENTARIOPRODUCTO || '',
     body.COMENTARIO || '',
     body.COMENTARIOSTOCK || '',
@@ -241,7 +241,7 @@ export const ParamsDetailOrder = (body, formaPago, lastIdOrder) => [
     lastIdOrder];
 
 
-export const ParamsEnvioDetailOrder = (totalEnvio, ivaEnvio, subTotalEnvio, codProducto, formaPago, lastIdOrder) => [
+export const ParamsEnvioDetailOrder = (totalEnvio, ivaEnvio, subTotalEnvio, codProducto, formaPago, commentEnvio, lastIdOrder) => [
     //Cantidad artículos
     1,
     0,
@@ -257,7 +257,7 @@ export const ParamsEnvioDetailOrder = (totalEnvio, ivaEnvio, subTotalEnvio, codP
     '',
     // Código del producto
     codProducto || '',
-    '',
+    commentEnvio,
     '',
     '',
     '',
@@ -271,9 +271,19 @@ export const ParamsEnvioDetailOrder = (totalEnvio, ivaEnvio, subTotalEnvio, codP
     0,
     lastIdOrder];
 
+export const SqlGetAllOrders = (status) => `SELECT T0.ID,
+       T0.ESTADO,
+       T0.FECHACREACION,
+       T0.CLIENTEID,
+       T1."Nombres",
+       T1."Cliente",
+       T1."Ciudad",
+       T1."Celular",
+       T1."Tipo",
+       T0.VENDEDOR,
+       T3.CITY
+FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
+         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" = 'Mayoristas' AND T0.ESTADO = ${status}
+         INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID`;
 
-// export const QuerySearch = () => `SELECT U.*
-// FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS AS U
-// JOIN (SELECT CURRENT_IDENTITY_VALUE() AS ID FROM DUMMY) AS I
-// ON U.ID = I.ID;`;
 

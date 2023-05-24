@@ -15,7 +15,7 @@ import { getSociosNegocio, getCondicionPago } from '../controllers/SociosDeNegoc
 import {getAllProducts, getListPriceByCodeAndUser, getProduct, getSearchProducts} from '../controllers/Product.js'
 // Clientes
 import {getSearchCustomers} from "../controllers/Customer.js";
-import {CreateOrder} from "../controllers/Order.js";
+import {CreateOrder, getAllOrders} from "../controllers/Order.js";
 
 
 
@@ -56,6 +56,7 @@ router.get('/api/customers/search', getSearchCustomers)
 
 //HT-BUSINESS HANA DB | Create Order
 router.post("/api/orders/order", CreateOrder);
+router.get("/api/orders", getAllOrders)
 
 
 export default router;
