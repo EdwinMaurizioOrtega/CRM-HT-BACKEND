@@ -218,7 +218,7 @@ export const ParamsDetailOrder = (body, formaPago, lastIdOrder) => [
     body.FECHAACTUALIZACION || '',
     dateAll,
     body.OBSERVACIONES || '',
-    body.PRECIOUNITARIOVENTA || 0.00,
+    body.price || 0.00,
     body.CODIGO || '',
     formaPago,
     // El total.
@@ -249,7 +249,7 @@ export const ParamsEnvioDetailOrder = (totalEnvio, ivaEnvio, subTotalEnvio, codP
     '',
     dateAll,
     '',
-    0.00,
+    subTotalEnvio,
     codProducto,
     formaPago || '',
     // El total.
