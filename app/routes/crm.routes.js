@@ -15,7 +15,13 @@ import { getSociosNegocio, getCondicionPago } from '../controllers/SociosDeNegoc
 import {getAllProducts, getListPriceByCodeAndUser, getProduct, getSearchProducts} from '../controllers/Product.js'
 // Clientes
 import {getSearchCustomers} from "../controllers/Customer.js";
-import {CreateOrder, getAllOrders} from "../controllers/Order.js";
+import {
+    CreateOrder,
+    getAllOrders,
+    getDetailOrder, putChangePayment, putChangeWarehouse, putDetailOrderDelete, putDetailOrderDiscount,
+    putDetailOrderPriceUnit, putDetailOrderQuantity
+} from "../controllers/Order.js";
+import {CreateInvoiceSAP} from "../controllers/SAP.js";
 
 
 
@@ -56,7 +62,25 @@ router.get('/api/customers/search', getSearchCustomers)
 
 //HT-BUSINESS HANA DB | Create Order
 router.post("/api/orders/order", CreateOrder);
+//HT-BUSINESS HANA DB | Get All Orders Status 6 ?
 router.get("/api/orders", getAllOrders)
+//HT-BUSINESS HANA DB | Obtener el detalle por el numero de la orden
+router.get("/api/orders/order/detail", getDetailOrder)
+//HT-BUSINESS HANA DB | Actualizar el detalle por el ID detalle pedido.
+router.put("/api/orders/order/detail/priceunit", putDetailOrderPriceUnit )
+router.put("/api/orders/order/detail/quantity", putDetailOrderQuantity )
+router.put("/api/orders/order/detail/discount", putDetailOrderDiscount )
+router.delete("/api/orders/order/detail/delete", putDetailOrderDelete )
+
+// HT-BUSINESS HANA DB | Cambiar la bodega de una orden | Área de aprobacion de pedidos
+router.put("/api/orders/order/change_warehouse", putChangeWarehouse)
+
+// HT-BUSINESS HANA DB | Cambiar la forma de pago de una orden | Área de aprobacion de pedidos
+router.put("/api/orders/order/change_payment", putChangePayment)
+
+//Crear la oden en el sistema SAP - Orden de venta SAP
+router.post( "/api/orden_venta_sap", CreateInvoiceSAP)
+
 
 
 export default router;

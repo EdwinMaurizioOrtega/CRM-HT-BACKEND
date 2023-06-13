@@ -1,5 +1,5 @@
 import {consultas, insertOrder} from "../config/HANADB.js";
-import {ParamsOrder, SqlGetAllOrders, SqlInsertOrder} from "../models/Order.js";
+import {SqlGetAllOrders, SqlGetDetailOrder, SqlGetOrderByID} from "../models/Order.js";
 
 export const CreateOrder = async (req, res) => {
 
@@ -57,56 +57,260 @@ export const getAllOrders = async (req, res) => {
     }
 
 
+};
+
+export const getDetailOrder = async (req, res) => {
+
+    try {
+// Parametro id corresponde a codigo
+        const id = req.query.id;
+        console.log("Order No.: " + id);
+
+// Creamos las consultas
+        const SqlQuery = SqlGetDetailOrder(id);
+        const SqlQueryOrder = SqlGetOrderByID(id);
+
+// Función para enviar sentencias SQL a la DB HANA
+        const executeQuery = (query) => {
+            return new Promise((resolve, reject) => {
+                consultas(query, (err, result) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(result);
+                    }
+                });
+            });
+        };
+
+// Ejecutar las consultas y combinar los resultados
+        Promise.all([executeQuery(SqlQuery), executeQuery(SqlQueryOrder)])
+            .then(([resultQuery, resultQueryOrder]) => {
+                console.log(resultQuery);
+                console.log(resultQueryOrder);
+
+                res.send({
+                    data: {
+                        ...resultQueryOrder[0], // Agregar todos los valores de resultQueryOrder en la raíz de data
+                        items: resultQuery,
+                    },
+                });
+            })
+            .catch((err) => {
+                throw err;
+            });
+
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+
 }
 
-// CREATE TABLE GRUPO_EMPRESARIAL_HT.ht_orders
-// (
-//     id                        INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
-//     clienteid                 INTEGER,
-//     estado                    INTEGER,
-//     fecha                     NVARCHAR(255),
-//     fechaactualizacion        NVARCHAR(255),
-//     fechacreacion             NVARCHAR(255),
-//     formadepago               NVARCHAR(255),
-//     guardado                  INTEGER,
-//     hora                      NVARCHAR(255),
-//     latitud                   DOUBLE PRECISION,
-//     longitud                  DOUBLE PRECISION,
-//     observaciones             NVARCHAR(255),
-//     online                    BOOLEAN DEFAULT TRUE                             NOT NULL,
-//     subtotal                  DOUBLE PRECISION,
-//     total                     DOUBLE PRECISION,
-//     totaliva                  DOUBLE PRECISION,
-//     usuarioaactualizacion     NVARCHAR(255),
-//     vendedor                  NVARCHAR(255),
-//     vendedorid                INTEGER,
-//     localcliente_id           BIGINT,
-//     empresa                   NVARCHAR(255),
-//     fechafacturacion          NVARCHAR(255),
-//     numerofacturae4           NVARCHAR(255),
-//     numerofacturahipertronics NVARCHAR(255),
-//     numerofacturalidenar      NVARCHAR(255),
-//     numeroguia                NVARCHAR(255),
-//     observacionesb            NVARCHAR(255),
-//     notacliente               NVARCHAR(255),
-//     usuarioaprobo             NVARCHAR(255),
-//     planpagostomebamba_id     BIGINT,
-//     aplicacionorigen          NVARCHAR(255),
-//     comentarioentrega         NVARCHAR(255),
-//     fechaentrega              NVARCHAR(255),
-//     nombreusuarioentrega      NVARCHAR(255),
-//     usuarioentrega_id         BIGINT,
-//     fechaentregasolicitada    NVARCHAR(255),
-//     idusuarioentregara        INTEGER,
-//     nombreusuarioentregara    NVARCHAR(255),
-//     courier                   NVARCHAR(255),
-//     usuarioentregabodega_id   BIGINT,
-//     bodega                    INTEGER,
-//     pedidocategoriapropia     INTEGER,
-//     imagena                   NVARCHAR(255),
-//     imagenb                   NVARCHAR(255),
-//     imagen                    NVARCHAR(255),
-//     imagenguia                NVARCHAR(255),
-//     fechaaprobo               NVARCHAR(255),
-//     docnum                    INTEGER
-// );
+export const putDetailOrderPriceUnit = async (req, res) => {
+
+    try {
+
+        //Parametro que llegan en el body
+        const {ID_DETALLE_ORDEN, NEW_PRICE_UNIT} = req.body;
+        console.log("IdDettaleOrden: " + ID_DETALLE_ORDEN)
+
+        // //Sentecia actualizar orden
+        const SqlQuery = `UPDATE GRUPO_EMPRESARIAL_HT.HT_ORDERS_DETAIL t
+                                SET t.PRECIOUNITARIOVENTA = ${NEW_PRICE_UNIT}
+                                WHERE t.ID = ${ID_DETALLE_ORDEN}`;
+
+        // //Funcion para enviar sentencias SQL a la DB HANA
+        consultas(SqlQuery, async (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result)
+                    res.status(200);
+                }
+            }
+        )
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+}
+
+
+
+export const putDetailOrderQuantity = async (req, res) => {
+
+    try {
+
+        //Parametro que llegan en el body
+        const {ID_DETALLE_ORDEN, NEW_QUANTITY} = req.body;
+        console.log("IdDettaleOrden: " + ID_DETALLE_ORDEN)
+
+        // //Sentecia actualizar orden
+        const SqlQuery = `UPDATE GRUPO_EMPRESARIAL_HT.HT_ORDERS_DETAIL t
+                                SET t.CANTIDAD = ${NEW_QUANTITY}
+                                WHERE t.ID = ${ID_DETALLE_ORDEN}`;
+
+        // //Funcion para enviar sentencias SQL a la DB HANA
+        consultas(SqlQuery, async (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result)
+                    res.status(200);
+                }
+            }
+        )
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+}
+
+
+export const putDetailOrderDiscount = async (req, res) => {
+
+    try {
+
+        //Parametro que llegan en el body
+        const {ID_DETALLE_ORDEN, NEW_DISCOUNT} = req.body;
+        console.log("IdDettaleOrden: " + ID_DETALLE_ORDEN)
+
+        // //Sentecia actualizar orden
+        const SqlQuery = `UPDATE GRUPO_EMPRESARIAL_HT.HT_ORDERS_DETAIL t
+                                    SET t.DISCOUNTPERCENTSAP = ${NEW_DISCOUNT}
+                                    WHERE t.ID = ${ID_DETALLE_ORDEN}`;
+
+        // //Funcion para enviar sentencias SQL a la DB HANA
+        consultas(SqlQuery, async (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result)
+                    res.status(200);
+                }
+            }
+        )
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+}
+
+
+export const putDetailOrderDelete = async (req, res) => {
+
+    try {
+
+        //Parametro name corresponde a codigo
+        const id = req.query.ID;
+        console.log("userId: " + id)
+
+        // //Sentecia consultar el usuario
+        const SqlQuery = `DELETE
+                                FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS_DETAIL
+                                WHERE ID = ${id}`;
+
+        // //Funcion para enviar sentencias SQL a la DB HANA
+        consultas(SqlQuery, async (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result)
+                    res.status(200);
+                }
+            }
+        )
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+}
+
+
+export const putChangeWarehouse = async (req, res) => {
+
+    try {
+
+        //Parametro que llegan en el body
+        const {ID_ORDER, NEW_WAREHOUSE} = req.body;
+        console.log("IdOrden: " + ID_ORDER)
+
+        // //Sentecia actualizar orden
+        const SqlQuery = `UPDATE GRUPO_EMPRESARIAL_HT.HT_ORDERS t
+                                SET t.BODEGA = ${NEW_WAREHOUSE}
+                                WHERE t.ID = ${ID_ORDER};`;
+
+        // //Funcion para enviar sentencias SQL a la DB HANA
+        consultas(SqlQuery, async (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result)
+                    res.status(200);
+                }
+            }
+        )
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+}
+
+
+export const putChangePayment = async (req, res) => {
+
+    try {
+
+        //Parametro que llegan en el body
+        const {ID_ORDER, NEW_PAYMENT} = req.body;
+        console.log("IdOrden: " + ID_ORDER)
+
+        // //Sentecia actualizar orden
+        const SqlQuery = `UPDATE GRUPO_EMPRESARIAL_HT.HT_ORDERS t
+                                    SET t.FORMADEPAGO = '${NEW_PAYMENT}'
+                                    WHERE t.ID = ${ID_ORDER};`;
+
+        // //Funcion para enviar sentencias SQL a la DB HANA
+        consultas(SqlQuery, async (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result)
+                    res.status(200);
+                }
+            }
+        )
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+}

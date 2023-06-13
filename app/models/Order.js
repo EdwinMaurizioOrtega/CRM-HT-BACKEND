@@ -110,7 +110,7 @@ export const ParamsOrder = (body) => [
     dateAll,
     body.FECHAACTUALIZACION || '',
     dateAll,
-    body.FORMADEPAGO || '',
+    body.checkoutData.method || '',
     body.GUARDADO || 1,
     body.HORA || '',
     body.LATITUD || 0.00,
@@ -271,6 +271,7 @@ export const ParamsEnvioDetailOrder = (totalEnvio, ivaEnvio, subTotalEnvio, codP
     0,
     lastIdOrder];
 
+//Obtener lista de ordenes por estado
 export const SqlGetAllOrders = (status) => `SELECT T0.ID,
        T0.ESTADO,
        T0.FECHACREACION,
@@ -284,6 +285,37 @@ export const SqlGetAllOrders = (status) => `SELECT T0.ID,
        T3.CITY
 FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
          INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" = 'Mayoristas' AND T0.ESTADO = ${status}
+         INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID`;
+
+export const SqlGetDetailOrder = (idOrder) => `select T0.ID,
+       T0.PRODUCTO_ID,
+       T1.NOMBRE,
+       T0.TIPOPRECIO,
+       T0.COMENTARIOPRECIO,
+       T0.DISCOUNTPERCENTSAP,
+       T0.CANTIDAD,
+       T0.PRECIOUNITARIOVENTA,
+       T0.TOTAL,
+       T0.ID_ORDER
+from GRUPO_EMPRESARIAL_HT.HT_ORDERS_DETAIL T0
+         LEFT JOIN EC_SBO_LIDENAR.WEB_HT_PRODUCTOS T1 ON T1.CODIGO = T0.PRODUCTO_ID
+where ID_ORDER = ${idOrder}`;
+
+export const SqlGetOrderByID = (idOrder) => `SELECT T0.ID,
+       T0.ESTADO,
+       T0.FECHACREACION,
+       T0.CLIENTEID,
+       T1."Nombres",
+       T1."Cliente",
+       T1."Ciudad",
+       T1."Celular",
+       T1."Tipo",
+       T0.VENDEDOR,
+       T0.BODEGA,
+       T0.FORMADEPAGO,
+       T3.CITY
+FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
+         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" = 'Mayoristas' AND T0.ESTADO = 6 AND T0.ID = ${idOrder}
          INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID`;
 
 
