@@ -1,14 +1,89 @@
 import axios from "axios";
 import * as https from "https";
 import {format} from "date-fns";
+import {SqlGetDetailOrder, SqlGetOrderByID, SqlGetUser} from "../models/Order.js";
+import {consultas} from "../config/HANADB.js";
 
 
 const dateAll = format(new Date(), 'yyyy-MM-dd');
 
 export const CreateInvoiceSAP = async (req, res) => {
     //Lo que llega.
-    const CardCode = `CL${req.body.CardCode}` ; // Reemplaza 'CLIENTE_A_VERIFICAR' con el código de cliente adecuado
-    console.log("CardCode: " + CardCode);
+    const ID_ORDER = req.body.ID_ORDER;
+    const ID_USER = req.body.ID_USER;
+    console.log("Número de orden: " + ID_ORDER);
+
+
+    try {
+        // Consultas:
+        //Dettale de la orden -_-.
+        const SqlQuery = SqlGetDetailOrder(ID_ORDER);
+        //Orden -_-
+        const SqlQueryOrder = SqlGetOrderByID(ID_ORDER);
+        //Usuario
+        const SqlUserQuery = SqlGetUser(ID_USER);
+
+// Función para enviar sentencias SQL a la DB HANA
+        const executeQuery = (query) => {
+            return new Promise((resolve, reject) => {
+                consultas(query, (err, result) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(result);
+                    }
+                });
+            });
+        };
+
+// Ejecutar las consultas y combinar los resultados
+        Promise.all([executeQuery(SqlQuery), executeQuery(SqlQueryOrder), executeQuery(SqlUserQuery)])
+            .then(([resultQuery, resultQueryOrder, resultQueryUser]) => {
+
+                //Orden
+                console.log(resultQueryOrder[0]);
+                //Detalle de la orden
+                console.log(resultQuery);
+                //Usuario
+                console.log(resultQueryUser[0])
+
+                let answer = CrearOrdenServiceLayer(resultQueryOrder[0], resultQuery, resultQueryUser[0])
+
+                res.status(200).json({answer: answer});
+
+            })
+            .catch((err) => {
+                throw err;
+            });
+
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+
+};
+
+
+async function CrearOrdenServiceLayer(orden, detalle, usuario) {
+
+    console.log(orden);
+    console.log(detalle);
+    console.log(usuario);
+
+    const IdOrder = orden.ID;
+    const CardCode = `CL${orden.CLIENTEID}`;
+    const PaymentGroupCode = orden.FORMADEPAGO;
+    const WarehouseCode = orden.BODEGA;
+
+    //Nombre usuario:
+    const displayname = usuario.DISPLAYNAME;
+
+
+    //Creacion de una orden en una base datos.
 
     let the_token;
 
@@ -20,7 +95,7 @@ export const CreateInvoiceSAP = async (req, res) => {
     };
 
     const axiosConfig = {
-        httpsAgent: new https.Agent({ rejectUnauthorized: false })
+        httpsAgent: new https.Agent({rejectUnauthorized: false})
     };
 
     try {
@@ -34,7 +109,7 @@ export const CreateInvoiceSAP = async (req, res) => {
         const businessPartnersUrl = `https://192.168.0.154:50000/b1s/v1/BusinessPartners('${CardCode}')`;
         const webTarget = axios.create({
             baseURL: businessPartnersUrl,
-            httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+            httpsAgent: new https.Agent({rejectUnauthorized: false}),
             headers: {
                 'Content-Type': 'application/json',
                 'Cookie': `B1SESSION=${the_token}; ROUTEID=.node3`
@@ -47,24 +122,19 @@ export const CreateInvoiceSAP = async (req, res) => {
                 console.log("EXISTE EL CLIENTE..?: " + statusBusinessPartners);
 
                 if (statusBusinessPartners === 200) {
-                    const message_go = {
-                        severity: 'info',
-                        summary: 'Mensaje',
-                        detail: 'CLIENTE EXISTE EN EL SISTEMA SAP!',
-                    };
                     // Mostrar mensaje en la consola
-                    console.log(message_go);
+                    const notification = "CLIENTE EXISTE EN EL SISTEMA SAP!";
+                    console.log(notification);
 
                     const data = response.data;
                     const PayTermsGrpCode = data.PayTermsGrpCode;
                     const SalesPersonCode = data.SalesPersonCode;
 
-
                     // Crear orden de venta en HANA SAP
                     const orderUrl = 'https://192.168.0.154:50000/b1s/v1/Orders';
                     const webTargetDos = axios.create({
                         baseURL: orderUrl,
-                        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+                        httpsAgent: new https.Agent({rejectUnauthorized: false}),
                         headers: {
                             'Content-Type': 'application/json',
                             'Cookie': `B1SESSION=${the_token}; ROUTEID=.node3`
@@ -72,37 +142,36 @@ export const CreateInvoiceSAP = async (req, res) => {
                     });
 
                     const cliente = {
+                        // CL - Cédula || PL - RUC || CE - Cliente Externo ==> Extrae del CRM
                         CardCode: CardCode,
+                        // Fecha de creaión de la orden de venta.
                         DocDueDate: dateAll,
-                        PaymentGroupCode: SelectedCondicionPago || PayTermsGrpCode,
+                        //Enviamos el ID de la condicion de pago de la orden
+                        //PaymentGroupCode: SelectedCondicionPago || PayTermsGrpCode,
+                        PaymentGroupCode: PaymentGroupCode,
+                        //Empledo de ventas SAP - 17 David Granda
                         SalesPersonCode: SalesPersonCode,
+                        //FormaPago
                         U_SYP_FORMAP: 20,
+                        //FormaPago 2
                         U_SYP_FORMAPAGO2: 20,
+
+                        //Artículos - detalle de la orden
                         DocumentLines: [],
                     };
 
                     // Detalles de la orden de venta
                     let counter = 0;
-                    for (const detallePedido of pedidoSeleccionado.detalles) {
+                    for (const detallePedido of detalle) {
                         const item = {
                             LineNum: counter++,
-                            ItemCode: detallePedido.producto.codigo,
-                            Quantity: detallePedido.cantidad,
-                            DiscountPercent: detallePedido.discountPercentSAP,
-                            UnitPrice: detallePedido.precioUnitarioVenta,
+                            ItemCode: detallePedido.PRODUCTO_ID,
+                            Quantity: detallePedido.CANTIDAD,
+                            DiscountPercent: detallePedido.DISCOUNTPERCENTSAP,
+                            UnitPrice: detallePedido.PRECIOUNITARIOVENTA,
                         };
 
-                        if (pedidoSeleccionado.bodega === 0) {
-                            item.WarehouseCode = '002'; // Bodega Mayorista Cuenca
-                        } else if (pedidoSeleccionado.bodega === 3) {
-                            item.WarehouseCode = '006'; // Bodega Metropolitan Quito
-                        } else if (pedidoSeleccionado.bodega === 4) {
-                            item.WarehouseCode = '015'; // Bodega Blu Bahía
-                        } else if (pedidoSeleccionado.bodega === 5) {
-                            item.WarehouseCode = '020'; // Bodega Manta
-                        } else if (pedidoSeleccionado.bodega === 10) {
-                            item.WarehouseCode = '019'; // Bodega MovilCelistic
-                        }
+                        item.WarehouseCode = WarehouseCode;
 
                         cliente.DocumentLines.push(item);
                     }
@@ -110,31 +179,58 @@ export const CreateInvoiceSAP = async (req, res) => {
                     const message = JSON.stringify(cliente);
                     console.log(message);
 
-                    webTargetDos.post('/', message)
+                    webTargetDos.post('', cliente)
                         .then(responseDos => {
                             const statusOrders = responseDos.status;
-                            console.log("ORDEN TRABAJO CREADA..?: " + statusOrders);
+                            console.log("ORDEN TRABAJO CREACION STATUS..?: " + statusOrders);
 
                             if (statusOrders === 201) {
-                                const message_orders = {
-                                    severity: 'info',
-                                    summary: 'Mensaje',
-                                    detail: 'ORDEN CREADA EN EL SISTEMA SAP!',
-                                };
+                                const notification = 'ORDEN CREADA EN EL SISTEMA SAP!';
                                 // Mostrar mensaje en la consola
-                                console.log(message_orders);
+                                console.log(notification);
 
                                 const dataDos = responseDos.data;
                                 console.log("Respuesta SAP: " + dataDos);
 
-                                const joRe = JSON.parse(dataDos);
-                                const docNumSAP = joRe.DocNum;
-                                pedidoSeleccionado.docNum = docNumSAP;
-                                pedidoDAO.Actualizar(pedidoSeleccionado);
+                                //const joRe = JSON.parse(dataDos);
+                                const docNumSAP = dataDos.DocNum;
 
-                                Guardar(usuarioX);
+                                // Guardamos el docNumSAP en la orden de la base de datos HANA
+                                try {
 
-                                listaPedido = pedidoDAO.getAllPendienteAprobarWebB();
+                                    // Parametro name corresponde a codigo
+                                    // Sentecia consultar el usuario
+                                    const SqlQuery = `UPDATE GRUPO_EMPRESARIAL_HT.HT_ORDERS t
+                                    SET t.ESTADO        = 0,
+                                    t.USUARIOAPROBO = '${displayname}',
+                                    t.FECHAAPROBO   = '${dateAll}',
+                                    t.DOCNUM        = ${docNumSAP}
+                                    WHERE t.ID = ${IdOrder}`;
+
+                                    // //Funcion para enviar sentencias SQL a la DB HANA
+                                    consultas(SqlQuery, async (err, result) => {
+                                            if (err) {
+                                                throw err
+                                            } else {
+                                                console.log(result);
+                                                return notification;
+
+                                                // res.status(200);
+                                            }
+                                        }
+                                    )
+
+                                } catch (error) {
+                                    console.error(error);
+                                    return res.status(500).json({
+                                        message: 'Internal server error.',
+                                    });
+                                }
+
+                                // Guardar(usuarioX);
+
+                                // Importante muy importante
+                                //listaPedido = pedidoDAO.getAllPendienteAprobarWebB();
 
                                 //console.log(data);
 
@@ -164,25 +260,20 @@ export const CreateInvoiceSAP = async (req, res) => {
                 }
 
 
-
                 if (statusBusinessPartners === 400 || statusBusinessPartners === 404) {
                     const dataBusinessPartners = response.data;
-                    const message_go = {
-                        severity: 'info',
-                        summary: 'Mensaje',
-                        detail: 'CLIENTE NO CREADO EN EL SISTEMA SAP! : ' + dataBusinessPartners,
-                    };
+                    const notification = "CLIENTE NO CREADO EN EL SISTEMA SAP! : " + dataBusinessPartners;
                     // Mostrar mensaje en la consola
-                    console.log(message_go);
+                    console.log(notification);
                 }
             })
             .catch(error => {
                 console.error(error);
             });
 
-        res.status(200).json({ success: true, token: the_token });
+        // res.status(200).json({success: true, token: the_token});
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, error: 'Error al crear la orden' });
+        // res.status(500).json({success: false, error: 'Error al crear la orden'});
     }
-};
+}

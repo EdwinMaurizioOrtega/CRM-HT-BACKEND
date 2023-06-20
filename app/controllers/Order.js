@@ -66,8 +66,11 @@ export const getDetailOrder = async (req, res) => {
         const id = req.query.id;
         console.log("Order No.: " + id);
 
-// Creamos las consultas
+        // Consultas:
+
+        //Dettale de la orden -_-.
         const SqlQuery = SqlGetDetailOrder(id);
+        //Orden -_-
         const SqlQueryOrder = SqlGetOrderByID(id);
 
 // Función para enviar sentencias SQL a la DB HANA
@@ -143,7 +146,6 @@ export const putDetailOrderPriceUnit = async (req, res) => {
     }
 
 }
-
 
 
 export const putDetailOrderQuantity = async (req, res) => {
