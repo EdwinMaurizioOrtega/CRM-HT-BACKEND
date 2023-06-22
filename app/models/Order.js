@@ -287,6 +287,36 @@ FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
          INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" = 'Mayoristas' AND T0.ESTADO = ${status}
          INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID`;
 
+export const SqlGetOrdersAllStatusByVendedor = (idVendedor) => `SELECT T0.ID,
+       T0.ESTADO,
+       T0.FECHACREACION,
+       T0.CLIENTEID,
+       T1."Nombres",
+       T1."Cliente",
+       T1."Ciudad",
+       T1."Celular",
+       T1."Tipo",
+       T0.VENDEDOR,
+       T3.CITY
+FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0 
+         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" = 'Mayoristas' AND T0.VENDEDORID = '${idVendedor}'
+         INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID`;
+
+export const SqlGetOrdersByWarehouses = (house) => `SELECT T0.ID,
+       T0.ESTADO,
+       T0.FECHACREACION,
+       T0.CLIENTEID,
+       T1."Nombres",
+       T1."Cliente",
+       T1."Ciudad",
+       T1."Celular",
+       T1."Tipo",
+       T0.VENDEDOR,
+       T3.CITY
+FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
+         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" = 'Mayoristas' 
+         INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID AND T0.BODEGA = '${house}' AND T0.ESTADO = 0`;
+
 export const SqlGetDetailOrder = (idOrder) => `select T0.ID,
        T0.PRODUCTO_ID,
        T1.NOMBRE,

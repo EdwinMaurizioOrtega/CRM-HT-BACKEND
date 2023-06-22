@@ -1,5 +1,11 @@
 import {consultas, insertOrder} from "../config/HANADB.js";
-import {SqlGetAllOrders, SqlGetDetailOrder, SqlGetOrderByID} from "../models/Order.js";
+import {
+    SqlGetAllOrders,
+    SqlGetDetailOrder,
+    SqlGetOrderByID,
+    SqlGetOrdersAllStatusByVendedor,
+    SqlGetOrdersByWarehouses
+} from "../models/Order.js";
 
 export const CreateOrder = async (req, res) => {
 
@@ -27,13 +33,87 @@ export const CreateOrder = async (req, res) => {
     }
 };
 
+// Ordenes con estado
 export const getAllOrders = async (req, res) => {
+
+    const estado = req.query.estado;
 
     try {
 
         //Sin Parametros
         //Creamos la consulta
-        const SqlQuery = SqlGetAllOrders(6)
+        const SqlQuery = SqlGetAllOrders(estado)
+
+        //Funcion para enviar sentencias SQL a la DB HANA
+        consultas(SqlQuery, (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result)
+                    res.send({
+                        "orders": result
+                    })
+                }
+            }
+        )
+
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+
+};
+
+// Ordenes con todos los estados, para los vendedores
+export const getOrdersAllStatusByVendedor = async (req, res) => {
+
+    const idVendedor = req.query.ven;
+
+    try {
+
+        //Sin Parametros
+        //Creamos la consulta
+        const SqlQuery = SqlGetOrdersAllStatusByVendedor(idVendedor);
+
+        //Funcion para enviar sentencias SQL a la DB HANA
+        consultas(SqlQuery, (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result)
+                    res.send({
+                        "orders": result
+                    })
+                }
+            }
+        )
+
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+
+};
+
+
+// Ordenes pendientes de factura por número de bodega con estado 0
+export const getOrdersByWarehouse = async (req, res) => {
+
+    const house = req.query.bod;
+
+    try {
+
+        //Sin Parametros
+        //Creamos la consulta
+        const SqlQuery = SqlGetOrdersByWarehouses(house);
 
         //Funcion para enviar sentencias SQL a la DB HANA
         consultas(SqlQuery, (err, result) => {

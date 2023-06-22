@@ -18,8 +18,14 @@ import {getSearchCustomers} from "../controllers/Customer.js";
 import {
     CreateOrder,
     getAllOrders,
-    getDetailOrder, putChangePayment, putChangeWarehouse, putDetailOrderDelete, putDetailOrderDiscount,
-    putDetailOrderPriceUnit, putDetailOrderQuantity
+    getDetailOrder,
+    getOrdersAllStatusByVendedor, getOrdersByWarehouse,
+    putChangePayment,
+    putChangeWarehouse,
+    putDetailOrderDelete,
+    putDetailOrderDiscount,
+    putDetailOrderPriceUnit,
+    putDetailOrderQuantity
 } from "../controllers/Order.js";
 import {CreateInvoiceSAP} from "../controllers/SAP.js";
 
@@ -64,6 +70,8 @@ router.get('/api/customers/search', getSearchCustomers)
 router.post("/api/orders/order", CreateOrder);
 //HT-BUSINESS HANA DB | Get All Orders Status 6 ?
 router.get("/api/orders", getAllOrders)
+router.get("/api/orders/vendedor", getOrdersAllStatusByVendedor)
+router.get("/api/orders/bodega", getOrdersByWarehouse)
 //HT-BUSINESS HANA DB | Obtener el detalle por el numero de la orden
 router.get("/api/orders/order/detail", getDetailOrder)
 //HT-BUSINESS HANA DB | Actualizar el detalle por el ID detalle pedido.
