@@ -25,7 +25,7 @@ import {
     putDetailOrderDelete,
     putDetailOrderDiscount,
     putDetailOrderPriceUnit,
-    putDetailOrderQuantity
+    putDetailOrderQuantity, putFacturar
 } from "../controllers/Order.js";
 import {CreateInvoiceSAP} from "../controllers/SAP.js";
 
@@ -88,6 +88,9 @@ router.put("/api/orders/order/change_payment", putChangePayment)
 
 //Crear la oden en el sistema SAP - Orden de venta SAP
 router.post( "/api/orden_venta_sap", CreateInvoiceSAP)
+
+//Crear el número de factura, valor total, numero de guía, estado a facturado etc.
+router.put('/api/orders/order/facturar', putFacturar)
 
 
 

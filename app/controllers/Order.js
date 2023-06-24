@@ -2,10 +2,11 @@ import {consultas, insertOrder} from "../config/HANADB.js";
 import {
     SqlGetAllOrders,
     SqlGetDetailOrder,
-    SqlGetOrderByID,
+    SqlGetOrderByID, SqlGetOrderByIDAndAllStatus,
     SqlGetOrdersAllStatusByVendedor,
     SqlGetOrdersByWarehouses
 } from "../models/Order.js";
+import {format} from "date-fns";
 
 export const CreateOrder = async (req, res) => {
 
@@ -151,7 +152,7 @@ export const getDetailOrder = async (req, res) => {
         //Dettale de la orden -_-.
         const SqlQuery = SqlGetDetailOrder(id);
         //Orden -_-
-        const SqlQueryOrder = SqlGetOrderByID(id);
+        const SqlQueryOrder = SqlGetOrderByIDAndAllStatus(id);
 
 // Función para enviar sentencias SQL a la DB HANA
         const executeQuery = (query) => {
@@ -169,7 +170,9 @@ export const getDetailOrder = async (req, res) => {
 // Ejecutar las consultas y combinar los resultados
         Promise.all([executeQuery(SqlQuery), executeQuery(SqlQueryOrder)])
             .then(([resultQuery, resultQueryOrder]) => {
+                // Detalle
                 console.log(resultQuery);
+                // Orden
                 console.log(resultQueryOrder);
 
                 res.send({
@@ -384,6 +387,46 @@ export const putChangePayment = async (req, res) => {
                 } else {
                     console.log(result)
                     res.status(200);
+                }
+            }
+        )
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+}
+
+const dateAll = format(new Date(), 'dd-MM-yyyy HH:mm:ss');
+
+export const putFacturar = async (req, res) => {
+
+    try {
+
+        //Parametro que llegan en el body
+        const {ID_ORDER, NUMERO_FACTURA, NUMERO_GUIA} = req.body;
+        console.log("IdOrden: " + ID_ORDER)
+
+        // Sentecia actualizar orden
+        const SqlQuery = `UPDATE GRUPO_EMPRESARIAL_HT.HT_ORDERS t
+                                    SET t.ESTADO               = 1,
+                                    t.FECHAFACTURACION     = '${dateAll}',
+                                    t.NUMEROFACTURALIDENAR = '${NUMERO_FACTURA}',
+                                    t.NUMEROGUIA           = '${NUMERO_GUIA}'
+                                WHERE t.ID = ${ID_ORDER}`;
+
+        // //Funcion para enviar sentencias SQL a la DB HANA
+        consultas(SqlQuery, async (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result)
+                    res.status(200).json({
+                        message: 'Factura guardada correctamente.',
+                    });
                 }
             }
         )
