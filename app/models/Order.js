@@ -312,7 +312,8 @@ export const SqlGetOrdersByWarehouses = (house) => `SELECT T0.ID,
        T1."Celular",
        T1."Tipo",
        T0.VENDEDOR,
-       T3.CITY
+       T3.CITY,
+       T0.DOCNUM
 FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
          INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" = 'Mayoristas' 
          INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID AND T0.BODEGA = '${house}' AND T0.ESTADO = 0`;
