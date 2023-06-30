@@ -216,7 +216,7 @@ export const putDetailOrderPriceUnit = async (req, res) => {
                     throw err
                 } else {
                     console.log(result)
-                    res.status(200);
+                    res.status(200).json({ message: 'Orden actualizada correctamente.' });
                 }
             }
         )
@@ -250,7 +250,7 @@ export const putDetailOrderQuantity = async (req, res) => {
                     throw err
                 } else {
                     console.log(result)
-                    res.status(200);
+                    res.status(200).json({ message: 'Orden actualizada correctamente.' });
                 }
             }
         )
@@ -284,7 +284,7 @@ export const putDetailOrderDiscount = async (req, res) => {
                     throw err
                 } else {
                     console.log(result)
-                    res.status(200);
+                    res.status(200).json({ message: 'Orden actualizada correctamente.' });
                 }
             }
         )
@@ -318,7 +318,7 @@ export const putDetailOrderDelete = async (req, res) => {
                     throw err
                 } else {
                     console.log(result)
-                    res.status(200);
+                    res.status(200).json({ message: 'Orden actualizada correctamente.' });
                 }
             }
         )
@@ -352,7 +352,7 @@ export const putChangeWarehouse = async (req, res) => {
                     throw err
                 } else {
                     console.log(result)
-                    res.status(200);
+                    res.status(200).json({ message: 'Orden actualizada correctamente.' });
                 }
             }
         )
@@ -386,7 +386,7 @@ export const putChangePayment = async (req, res) => {
                     throw err
                 } else {
                     console.log(result)
-                    res.status(200);
+                    res.status(200).json({ message: 'Orden actualizada correctamente.' });
                 }
             }
         )
