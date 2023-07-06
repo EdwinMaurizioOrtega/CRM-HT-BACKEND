@@ -25,7 +25,7 @@ import {
     putDetailOrderDelete,
     putDetailOrderDiscount,
     putDetailOrderPriceUnit,
-    putDetailOrderQuantity, putFacturar
+    putDetailOrderQuantity, putFacturar, putOrderAnular
 } from "../controllers/Order.js";
 import {CreateInvoiceSAP} from "../controllers/SAP.js";
 
@@ -79,6 +79,8 @@ router.put("/api/orders/order/detail/priceunit", putDetailOrderPriceUnit )
 router.put("/api/orders/order/detail/quantity", putDetailOrderQuantity )
 router.put("/api/orders/order/detail/discount", putDetailOrderDiscount )
 router.delete("/api/orders/order/detail/delete", putDetailOrderDelete )
+//HT-BUSINESS HANA DB | Anular una orden.
+router.put("/api/orders/order/anular", putOrderAnular )
 
 // HT-BUSINESS HANA DB | Cambiar la bodega de una orden | Área de aprobacion de pedidos
 router.put("/api/orders/order/change_warehouse", putChangeWarehouse)

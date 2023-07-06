@@ -332,6 +332,37 @@ export const putDetailOrderDelete = async (req, res) => {
 
 }
 
+//Anular orden
+export const putOrderAnular = async (req, res) => {
+
+    try {
+
+        //Parametro name corresponde a codigo
+        const { ID } = req.body.params;
+        console.log("idOrder: " + ID)
+
+        // //Sentecia consultar el usuario
+        const SqlQuery = `UPDATE GRUPO_EMPRESARIAL_HT.HT_ORDERS t SET t.ESTADO = 8 WHERE t.ID = ${ID}`;
+
+        // //Funcion para enviar sentencias SQL a la DB HANA
+        consultas(SqlQuery, async (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result)
+                    res.status(200).json({ message: 'Orden actualizada correctamente.' });
+                }
+            }
+        )
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+}
 
 export const putChangeWarehouse = async (req, res) => {
 
