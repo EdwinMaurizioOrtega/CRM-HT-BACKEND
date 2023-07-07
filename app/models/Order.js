@@ -365,7 +365,10 @@ export const SqlGetOrderByIDAndAllStatus = (idOrder) => `SELECT T0.ID,
        T0.VENDEDOR,
        T0.BODEGA,
        T0.FORMADEPAGO,
-       T3.CITY
+       T3.CITY,
+       T1.GLN,
+       T1."ValidComm",
+       T1."Balance"
 FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
          INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" = 'Mayoristas' AND T0.ID = ${idOrder}
          INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID`;
