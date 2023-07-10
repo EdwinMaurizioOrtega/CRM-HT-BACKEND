@@ -80,7 +80,7 @@ export function insertOrder(body, callback) {
 
                 // DETALLE ORDEN
                 const cart = body.checkoutData.cart;
-                let formaPago = body.checkoutData.method;
+                //let formaPago = body.checkoutData.method;
                 const lengthCart = cart.length;
                 console.log(lengthCart);
                 let processedCount = 0;
@@ -94,7 +94,7 @@ export function insertOrder(body, callback) {
 
                     const item = cart[index];
                     const sqlDetalle = SqlInsertDetailOrder();
-                    const paramsDetalle = ParamsDetailOrder(item, formaPago, lastIdOrder);
+                    const paramsDetalle = ParamsDetailOrder(item, lastIdOrder);
 
                     // Ejemplo de inserción de datos detalle orden
                     conn.exec(sqlDetalle, paramsDetalle, (insertErr, affectedRows) => {
@@ -120,7 +120,7 @@ export function insertOrder(body, callback) {
 
                 //SECCION ENVIO
                 const sqlEnvio = SqlInsertDetailOrder();
-
+                // Valor del envío
                 let totalEnvio = body.checkoutData.shipping;
                 let commentEnvio = body.checkoutData.comment;
                 let ivaEnvio = 0
@@ -159,7 +159,7 @@ export function insertOrder(body, callback) {
                         codProducto;
                 }
 
-                const paramsEnvio = ParamsEnvioDetailOrder(totalEnvio, ivaEnvio, subTotalEnvio, codProducto, formaPago, commentEnvio, lastIdOrder);
+                const paramsEnvio = ParamsEnvioDetailOrder(totalEnvio, ivaEnvio, subTotalEnvio, codProducto, commentEnvio, lastIdOrder);
 
                 // Ejemplo de inserción de datos de envio
                 conn.exec(sqlEnvio, paramsEnvio, (insertErr, affectedRows) => {

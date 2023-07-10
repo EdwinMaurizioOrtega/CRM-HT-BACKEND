@@ -210,7 +210,7 @@ export const SqlInsertDetailOrder = () => {
   )`;
 };
 // Order Detail - Params
-export const ParamsDetailOrder = (body, formaPago, lastIdOrder) => [
+export const ParamsDetailOrder = (body, lastIdOrder) => [
     //Cantidad artículos
     body.quantity || 0,
     body.ESTADO || 0,
@@ -218,9 +218,10 @@ export const ParamsDetailOrder = (body, formaPago, lastIdOrder) => [
     body.FECHAACTUALIZACION || '',
     dateAll,
     body.OBSERVACIONES || '',
-    body.price || 0.00,
+    body.price.Price || 0.00,
     body.CODIGO || '',
-    formaPago,
+    //Tipo precio SAP
+    body.price.PriceList,
     // El total.
     body.subtotal || 0.00,
     body.USUARIOAACTUALIZACION || '',
@@ -241,7 +242,7 @@ export const ParamsDetailOrder = (body, formaPago, lastIdOrder) => [
     lastIdOrder];
 
 
-export const ParamsEnvioDetailOrder = (totalEnvio, ivaEnvio, subTotalEnvio, codProducto, formaPago, commentEnvio, lastIdOrder) => [
+export const ParamsEnvioDetailOrder = (totalEnvio, ivaEnvio, subTotalEnvio, codProducto, commentEnvio, lastIdOrder) => [
     //Cantidad artículos
     1,
     0,
@@ -251,7 +252,7 @@ export const ParamsEnvioDetailOrder = (totalEnvio, ivaEnvio, subTotalEnvio, codP
     '',
     subTotalEnvio,
     codProducto,
-    formaPago || '',
+    '-' || '',
     // El total.
     subTotalEnvio || 0.00,
     '',
