@@ -75,7 +75,8 @@ async function CrearOrdenServiceLayer(orden, detalle, usuario) {
     console.log(usuario);
 
     const IdOrder = orden.ID;
-    const CardCode = `CL${orden.CLIENTEID}`;
+    //const CardCode = `CL${orden.CLIENTEID}`;
+    const CardCode = orden.CLIENTEID;
     const PaymentGroupCode = orden.FORMADEPAGO;
     const WarehouseCode = orden.BODEGA;
 
