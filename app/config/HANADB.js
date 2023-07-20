@@ -6,6 +6,7 @@ import {
     SqlInsertDetailOrder,
     SqlInsertOrder
 } from "../models/Order.js";
+import createFormatDateTime from '../utils/dateFormatter.js';
 
 export function consultas(SqlQuery, callback) {
     console.log("Sentencia: " + SqlQuery);
@@ -37,6 +38,7 @@ export function consultas(SqlQuery, callback) {
 }
 
 export function insertOrder(body, callback) {
+
     const connParams = {
         serverNode: '192.168.0.154:30015',
         uid: 'SYSTEM',
@@ -54,8 +56,12 @@ export function insertOrder(body, callback) {
 
         console.log('Conexión establecida correctamente');
 
+        //Creamos una nueva instancia de la fecha -_-
+        const currentDate = new Date();
+        const dateAll = createFormatDateTime(currentDate);
+
         const sql = SqlInsertOrder();
-        const params = ParamsOrder(body);
+        const params = ParamsOrder(body, dateAll);
 
         // Ejemplo de inserción de datos
         conn.exec(sql, params, (insertErr, affectedRows) => {
@@ -94,7 +100,7 @@ export function insertOrder(body, callback) {
 
                     const item = cart[index];
                     const sqlDetalle = SqlInsertDetailOrder();
-                    const paramsDetalle = ParamsDetailOrder(item, lastIdOrder);
+                    const paramsDetalle = ParamsDetailOrder(item, lastIdOrder, dateAll);
 
                     // Ejemplo de inserción de datos detalle orden
                     conn.exec(sqlDetalle, paramsDetalle, (insertErr, affectedRows) => {
@@ -159,7 +165,7 @@ export function insertOrder(body, callback) {
                         codProducto;
                 }
 
-                const paramsEnvio = ParamsEnvioDetailOrder(totalEnvio, ivaEnvio, subTotalEnvio, codProducto, commentEnvio, lastIdOrder);
+                const paramsEnvio = ParamsEnvioDetailOrder(totalEnvio, ivaEnvio, subTotalEnvio, codProducto, commentEnvio, lastIdOrder, dateAll);
 
                 // Ejemplo de inserción de datos de envio
                 conn.exec(sqlEnvio, paramsEnvio, (insertErr, affectedRows) => {

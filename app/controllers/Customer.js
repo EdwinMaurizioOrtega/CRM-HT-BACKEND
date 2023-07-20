@@ -15,7 +15,7 @@ export const getSearchCustomers = async (req, res) => {
 
     const SqlQuery = `SELECT t.*
         FROM EC_SBO_LIDENAR.WEB_HT_CLIENTES t
-        WHERE "Cliente" like '%${cleanQuery}%' and "Tipo" = 'Mayoristas'
+        WHERE "Cliente" LIKE '%${cleanQuery}%' AND "Tipo" IN ('Mayoristas', 'Aper')
         ORDER BY "Tipo" DESC`;
 
     //Funcion para enviar sentencias SQL a la DB HANA

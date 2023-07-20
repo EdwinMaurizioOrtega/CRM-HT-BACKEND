@@ -6,12 +6,7 @@ import {
     SqlGetOrdersAllStatusByVendedor,
     SqlGetOrdersByWarehouses
 } from "../models/Order.js";
-import {format} from "date-fns";
-
-import formatDateTime from "../utils/dateFormatter.js"
-
-// Formatea la fecha utilizando la función importada
-const dateAll = formatDateTime();
+import createFormatDateTime from "../utils/dateFormatter.js";
 
 export const CreateOrder = async (req, res) => {
 
@@ -436,11 +431,12 @@ export const putChangePayment = async (req, res) => {
 
 }
 
-//const dateAll = format(new Date(), 'dd-MM-yyyy HH:mm:ss');
-
 export const putFacturar = async (req, res) => {
 
     try {
+
+        const currentDate = new Date();
+        const dateAll = createFormatDateTime(currentDate);
 
         //Parametro que llegan en el body
         const {ID_ORDER, NUMERO_FACTURA, NUMERO_GUIA} = req.body;

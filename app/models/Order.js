@@ -1,11 +1,6 @@
 //Sentecia para crear una nueva orden.
 import {format} from "date-fns";
 
-import formatDateTime from "../utils/dateFormatter.js"
-
-// Formatea la fecha utilizando la función importada
-const dateAll = formatDateTime();
-
 export const SqlInsertOrder = () => {
     return `INSERT INTO GRUPO_EMPRESARIAL_HT.HT_ORDERS (
       CLIENTEID,
@@ -109,7 +104,7 @@ export const SqlInsertOrder = () => {
 //const dateAll = format(new Date(), 'dd-MM-yyyy HH:mm:ss');
 
 
-export const ParamsOrder = (body) => [
+export const ParamsOrder = (body, dateAll) => [
     body.checkoutData.billing.ID,
     6,
     dateAll,
@@ -215,7 +210,7 @@ export const SqlInsertDetailOrder = () => {
   )`;
 };
 // Order Detail - Params
-export const ParamsDetailOrder = (body, lastIdOrder) => [
+export const ParamsDetailOrder = (body, lastIdOrder, dateAll) => [
     //Cantidad artículos
     body.quantity || 0,
     body.ESTADO || 0,
@@ -247,7 +242,7 @@ export const ParamsDetailOrder = (body, lastIdOrder) => [
     lastIdOrder];
 
 
-export const ParamsEnvioDetailOrder = (totalEnvio, ivaEnvio, subTotalEnvio, codProducto, commentEnvio, lastIdOrder) => [
+export const ParamsEnvioDetailOrder = (totalEnvio, ivaEnvio, subTotalEnvio, codProducto, commentEnvio, lastIdOrder, dateAll) => [
     //Cantidad artículos
     1,
     0,
@@ -290,7 +285,7 @@ export const SqlGetAllOrders = (status) => `SELECT T0.ID,
        T0.VENDEDOR,
        T3.CITY
 FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
-         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" = 'Mayoristas' AND T0.ESTADO = ${status}
+         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') AND T0.ESTADO = ${status}
          INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID`;
 
 export const SqlGetOrdersAllStatusByVendedor = (idVendedor) => `SELECT T0.ID,
@@ -305,7 +300,7 @@ export const SqlGetOrdersAllStatusByVendedor = (idVendedor) => `SELECT T0.ID,
        T0.VENDEDOR,
        T3.CITY
 FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0 
-         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" = 'Mayoristas' AND T0.VENDEDORID = '${idVendedor}'
+         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') AND T0.VENDEDORID = '${idVendedor}'
          INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID`;
 
 export const SqlGetOrdersByWarehouses = (house) => `SELECT T0.ID,
@@ -321,7 +316,7 @@ export const SqlGetOrdersByWarehouses = (house) => `SELECT T0.ID,
        T3.CITY,
        T0.DOCNUM
 FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
-         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" = 'Mayoristas' 
+         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') 
          INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID AND T0.BODEGA = '${house}' AND T0.ESTADO = 0`;
 
 export const SqlGetDetailOrder = (idOrder) => `select T0.ID,
@@ -352,7 +347,7 @@ export const SqlGetOrderByID = (idOrder) => `SELECT T0.ID,
        T0.FORMADEPAGO,
        T3.CITY
 FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
-         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" = 'Mayoristas' AND T0.ESTADO = 6 AND T0.ID = ${idOrder}
+         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') AND T0.ESTADO = 6 AND T0.ID = ${idOrder}
          INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID`;
 
 
@@ -376,5 +371,5 @@ export const SqlGetOrderByIDAndAllStatus = (idOrder) => `SELECT T0.ID,
        T1."ValidComm",
        T1."Balance"
 FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
-         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" = 'Mayoristas' AND T0.ID = ${idOrder}
+         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') AND T0.ID = ${idOrder}
          INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID`;
