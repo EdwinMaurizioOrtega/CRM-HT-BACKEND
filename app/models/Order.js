@@ -1,6 +1,11 @@
 //Sentecia para crear una nueva orden.
 import {format} from "date-fns";
 
+import formatDateTime from "../utils/dateFormatter.js"
+
+// Formatea la fecha utilizando la función importada
+const dateAll = formatDateTime();
+
 export const SqlInsertOrder = () => {
     return `INSERT INTO GRUPO_EMPRESARIAL_HT.HT_ORDERS (
       CLIENTEID,
@@ -101,7 +106,7 @@ export const SqlInsertOrder = () => {
   )`;
 };
 
-const dateAll = format(new Date(), 'dd-MM-yyyy HH:mm:ss');
+//const dateAll = format(new Date(), 'dd-MM-yyyy HH:mm:ss');
 
 
 export const ParamsOrder = (body) => [
