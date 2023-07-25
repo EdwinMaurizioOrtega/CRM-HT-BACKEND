@@ -140,22 +140,22 @@ export function insertOrder(body, callback) {
                         codProducto = '06.04.15';
                         break;
                     case 3:
-                        ivaEnvio = totalEnvio * 0.12;
+                        ivaEnvio = totalEnvio * 0.107142857142857;
                         subTotalEnvio = totalEnvio - ivaEnvio;
                         codProducto = '06.04.16';
                         break;
                     case 5:
-                        ivaEnvio = totalEnvio * 0.12;
+                        ivaEnvio = totalEnvio * 0.107142857142857;
                         subTotalEnvio = totalEnvio - ivaEnvio;
                         codProducto = '06.04.17';
                         break;
                     case 7:
-                        ivaEnvio = totalEnvio * 0.12;
+                        ivaEnvio = totalEnvio * 0.107142857142857;
                         subTotalEnvio = totalEnvio - ivaEnvio;
                         codProducto = '06.04.18';
                         break;
                     case 13:
-                        ivaEnvio = totalEnvio * 0.12;
+                        ivaEnvio = totalEnvio * 0.107142857142857;
                         subTotalEnvio = totalEnvio - ivaEnvio;
                         codProducto = '06.04.19';
                         break;
