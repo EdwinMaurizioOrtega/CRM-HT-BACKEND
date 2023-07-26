@@ -1,6 +1,6 @@
 import {consultas, insertOrder} from "../config/HANADB.js";
 import {
-    SqlGetAllOrders,
+    SqlGetAllOrders, SqlGetAllOrdersRoleCredit,
     SqlGetDetailOrder,
     SqlGetOrderByID, SqlGetOrderByIDAndAllStatus,
     SqlGetOrdersAllStatusByVendedor,
@@ -34,7 +34,7 @@ export const CreateOrder = async (req, res) => {
     }
 };
 
-// Ordenes con estado
+// Ordenes por estado estado individual
 export const getAllOrders = async (req, res) => {
 
     const estado = req.query.estado;
@@ -44,6 +44,40 @@ export const getAllOrders = async (req, res) => {
         //Sin Parametros
         //Creamos la consulta
         const SqlQuery = SqlGetAllOrders(estado)
+
+        //Funcion para enviar sentencias SQL a la DB HANA
+        consultas(SqlQuery, (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result)
+                    res.send({
+                        "orders": result
+                    })
+                }
+            }
+        )
+
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+
+};
+
+
+// Ordenes con todos los estados para el área de crédito
+export const getAllOrdersRoleCredit = async (req, res) => {
+
+    try {
+
+        //Sin Parametros
+        //Creamos la consulta
+        const SqlQuery = SqlGetAllOrdersRoleCredit()
 
         //Funcion para enviar sentencias SQL a la DB HANA
         consultas(SqlQuery, (err, result) => {
@@ -105,7 +139,7 @@ export const getOrdersAllStatusByVendedor = async (req, res) => {
 };
 
 
-// Ordenes pendientes de factura por número de bodega con estado 0
+// Ordenes pendientes de factura por número de bodega con estado 0 y los facturados 1
 export const getOrdersByWarehouse = async (req, res) => {
 
     const house = req.query.bod;

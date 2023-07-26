@@ -17,7 +17,7 @@ import {getAllProducts, getListPriceByCodeAndUser, getProduct, getSearchProducts
 import {getSearchCustomers} from "../controllers/Customer.js";
 import {
     CreateOrder,
-    getAllOrders,
+    getAllOrders, getAllOrdersRoleCredit,
     getDetailOrder,
     getOrdersAllStatusByVendedor, getOrdersByWarehouse,
     putChangePayment,
@@ -68,9 +68,15 @@ router.get('/api/customers/search', getSearchCustomers)
 
 //HT-BUSINESS HANA DB | Create Order
 router.post("/api/orders/order", CreateOrder);
-//HT-BUSINESS HANA DB | Get All Orders Status 6 ?
+//HT-BUSINESS HANA DB | Get All Orders By Status 6 ? o lo que sea
 router.get("/api/orders", getAllOrders)
+
+//HT-BUSINESS HANA DB | Get All Orders Status (6, 0, 1, 8) para el rol de crédito
+router.get("/api/orders/credit", getAllOrdersRoleCredit)
+
 router.get("/api/orders/vendedor", getOrdersAllStatusByVendedor)
+
+//Bodega unicamente tiene acceso a los pedidos por facturar 0 y facturados 1
 router.get("/api/orders/bodega", getOrdersByWarehouse)
 //HT-BUSINESS HANA DB | Obtener el detalle por el numero de la orden
 router.get("/api/orders/order/detail", getDetailOrder)
