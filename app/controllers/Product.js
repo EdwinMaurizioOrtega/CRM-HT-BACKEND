@@ -4,7 +4,7 @@ export const getAllProducts = async (req, res) => {
 
     //Sin Parametros
     //Creamos la consulta
-    const SqlQuery = 'SELECT * FROM EC_SBO_LIDENAR.WEB_HT_PRODUCTOS';
+    const SqlQuery = `SELECT * FROM EC_SBO_LIDENAR.WEB_HT_PRODUCTOS WHERE STATUS = 'Y'`;
 
     //Funcion para enviar sentencias SQL a la DB HANA
     consultas(SqlQuery, (err, result) => {

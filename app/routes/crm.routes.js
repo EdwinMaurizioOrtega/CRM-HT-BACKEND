@@ -73,7 +73,7 @@ router.get("/api/orders", getAllOrders)
 
 //HT-BUSINESS HANA DB | Get All Orders Status (6, 0, 1, 8) para el rol de crédito
 router.get("/api/orders/credit", getAllOrdersRoleCredit)
-
+//Listar todos los pedidos por vendedor
 router.get("/api/orders/vendedor", getOrdersAllStatusByVendedor)
 
 //Bodega unicamente tiene acceso a los pedidos por facturar 0 y facturados 1
