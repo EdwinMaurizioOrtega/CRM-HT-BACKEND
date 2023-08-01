@@ -12,7 +12,13 @@ import {deleteUser, getAllUsers, getUser, IniciarSesion, MyAccount, putUser, Reg
 //HT-BUSINESS HANA DB
 import { getSociosNegocio, getCondicionPago } from '../controllers/SociosDeNegocios.js';
 // Productos
-import {getAllProducts, getListPriceByCodeAndUser, getProduct, getSearchProducts} from '../controllers/Product.js'
+import {
+    getAllProducts,
+    getListPriceByCodeAndUser,
+    getProduct,
+    getSearchProducts,
+    getStockProduct
+} from '../controllers/Product.js'
 // Clientes
 import {getSearchCustomers} from "../controllers/Customer.js";
 import {
@@ -58,6 +64,9 @@ router.get('/api/products/search', getSearchProducts)
 
 //HT-BUSINESS HANA DB | Lista precios producto
 router.get("/api/products/price_list_product", getListPriceByCodeAndUser);
+
+//HT-BUSINESS HANA DB | Stock por código-producto
+router.get('/api/products/stock/product', getStockProduct)
 
 //HT-BUSINESS HANA DB | Clientes
 router.get('/socios_de_negocio', getSociosNegocio)

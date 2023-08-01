@@ -47,6 +47,85 @@ export const getProduct = async (req, res) => {
 
 }
 
+export const getStockProduct = async (req, res) => {
+
+    //Parametro name corresponde a codigo
+    const code = req.query.code;
+    console.log("Go " + code)
+    //Creamos la consulta
+    const SqlQuery = `WITH ListaWarehouse AS (SELECT '019' AS WH
+                        FROM DUMMY
+                        UNION ALL
+                        SELECT '002'
+                        FROM DUMMY
+                        UNION ALL
+                        SELECT '006'
+                        FROM DUMMY
+                        UNION ALL
+                        SELECT '015'
+                        FROM DUMMY
+                        UNION ALL
+                        SELECT '024'
+                        FROM DUMMY
+                        UNION ALL
+                        SELECT '009'
+                        FROM DUMMY
+                        UNION ALL
+                        SELECT '014'
+                        FROM DUMMY
+                        UNION ALL
+                        SELECT '001'
+                        FROM DUMMY
+                        UNION ALL
+                        SELECT '011'
+                        FROM DUMMY
+                        UNION ALL
+                        SELECT '016'
+                        FROM DUMMY
+                        UNION ALL
+                        SELECT '017'
+                        FROM DUMMY
+                        UNION ALL
+                        SELECT '020'
+                        FROM DUMMY
+                        UNION ALL
+                        SELECT '022'
+                        FROM DUMMY
+                        UNION ALL
+                        SELECT '003'
+                        FROM DUMMY)
+SELECT L.WH                                       AS "BODEGA",
+       COALESCE(T1."ItemCode", '${code}')        AS "CODIGO",
+       COALESCE(SUM(T1."InQty" - T1."OutQty"), 0) AS "CANTIDAD",
+       COALESCE(T5."RESERVADO", 0) AS "RESERVADO",
+        (COALESCE(SUM(T1."InQty" - T1."OutQty"), 0) - COALESCE(T5."RESERVADO", 0)) AS "DISPONIBLE"
+
+FROM ListaWarehouse L
+         LEFT JOIN
+    EC_SBO_LIDENAR.OINM T1 ON L.WH = T1."Warehouse" AND T1."ItemCode" LIKE '${code}'
+LEFT JOIN
+    (SELECT T4.PRODUCTO_ID, SUM(T4.CANTIDAD) AS "RESERVADO", T3.BODEGA
+    FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T3
+    INNER JOIN GRUPO_EMPRESARIAL_HT.HT_ORDERS_DETAIL T4 ON T4.ID_ORDER = T3.ID AND T3.ESTADO IN (6, 0) AND T4.PRODUCTO_ID LIKE '${code}'
+    GROUP BY T3.BODEGA, T4.PRODUCTO_ID) T5 ON T5.PRODUCTO_ID = COALESCE(T1."ItemCode", '${code}')
+AND T5.BODEGA = T1."Warehouse"
+GROUP BY L.WH, T1."ItemCode",T5."RESERVADO"`;
+
+    //Funcion para enviar sentencias SQL a la DB HANA
+    consultas(SqlQuery, (err, result) => {
+            if (err) {
+                throw err
+            } else {
+                console.log(result)
+                res.send({
+                    "product_stock": result
+                })
+            }
+        }
+    )
+
+}
+
 export const getSearchProducts = async (req, res) => {
 
     //Parametro query corresponde al nombre del producto
