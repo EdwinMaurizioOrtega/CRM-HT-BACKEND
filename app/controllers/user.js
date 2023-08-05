@@ -3,6 +3,8 @@ import jwt from "jsonwebtoken";
 
 import {SqlQuerySignIn, SqlInsertUser} from "../models/user.js"
 import {consultas} from "../config/HANADB.js";
+import axios from "axios";
+import * as https from "https";
 
 const router = express.Router();
 
@@ -235,7 +237,7 @@ export const deleteUser = async (req, res) => {
     // //Sentecia consultar el usuario
     const SqlQuery = 'DELETE\n' +
         'FROM GRUPO_EMPRESARIAL_HT.HT_USERS\n' +
-        'WHERE ID = '+id;
+        'WHERE ID = ' + id;
 
 
     // //Funcion para enviar sentencias SQL a la DB HANA
@@ -248,5 +250,136 @@ export const deleteUser = async (req, res) => {
             }
         }
     )
+
+}
+
+const createAxiosInstance = (baseURL) => {
+    return axios.create({
+        baseURL,
+        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+};
+
+export const ServiEntrega = async (req, res) => {
+    try {
+        console.log(req.body);
+
+        // Create orden de venta in HANA SAP
+        const orderUrl = 'https://181.39.87.158:8021/api/guiawebs/';
+        const orderClient = createAxiosInstance(orderUrl);
+
+        const dataToSend = {
+            // GuiaWebs
+            id_tipo_logistica: 1,
+            detalle_envio_1: '',
+            detalle_envio_2: '',
+            detalle_envio_3: '',
+            // Ciudades
+            id_ciudad_origen: req.body.id_ciudad_origen,
+            id_ciudad_destino: req.body.id_ciudad_destino,
+            // Datos Destino
+            id_destinatario_ne_cl: req.body.id_destinatario_ne_cl,
+            razon_social_desti_ne: req.body.razon_social_desti_ne,
+            nombre_destinatario_ne: req.body.nombre_destinatario_ne,
+            apellido_destinatar_ne: req.body.apellido_destinatar_ne,
+            // MUY IMPORTANTE
+            direccion1_destinat_ne: 'Av. Colon 7-90 TEST TEST',
+            sector_destinat_ne: '',
+            telefono1_destinat_ne: req.body.telefono1_destinat_ne,
+            telefono2_destinat_ne: '',
+            codigo_postal_dest_ne: '',
+            // Datos Remitente || BODEGA
+            id_remitente_cl: req.body.id_remitente_cl,
+            razon_social_remite: req.body.razon_social_remite,
+            nombre_remitente: req.body.nombre_remitente,
+            apellido_remite: '',
+            direccion1_remite: req.body.direccion1_remite,
+            sector_remite: '',
+            telefono1_remite: req.body.telefono1_remite,
+            telefono2_remite: '',
+            codigo_postal_remi: '',
+            // 1 DOCUMENTO UNITARIO
+            // 2 MERCANCIA PREMIER
+            // 3 DOCUMENTO MASIVO
+            // 6 MERCANCIA INDUSTRIAL
+            // 8 VALIJA EMPRESARIAL 71 FARMA
+            id_producto: 2,
+            //
+            contenido: 'CELULARES',
+            // Cajas - Bultos
+            numero_piezas: req.body.numero_piezas || 0,
+            // Valor total
+            valor_mercancia: req.body.valor_mercancia,
+            // Valor 40%
+            valor_asegurado: req.body.valor_asegurado,
+            largo: 0,
+            ancho: 0,
+            alto: 0,
+            // El peso en nuestro caso es por bultos
+            peso_fisico: 0.0,
+            login_creacion: 'lidenar.sa',
+            password: 'lidenar'
+        };
+
+        const responseDos = await orderClient.post('', dataToSend);
+
+        // If the guia is created correctly with Status Code 201
+        if (responseDos.status === 201) {
+            const getId = responseDos.data.id;
+            console.log("Número de guia: " + getId);
+
+            const businessPartnersUrl = `https://181.39.87.158:7777/api/GuiasWeb/['${getId}','lidenar.sa','lidenar','1']`;
+            const businessPartnerClient = createAxiosInstance(businessPartnersUrl);
+
+            const response = await businessPartnerClient.get();
+
+            // If the guia exists, obtain the PDF file
+            if (response.status === 201) {
+                // Impimir un mensaje
+                const mensaje = response.data.mensaje;
+                console.log(mensaje);
+                // Decode and save the base64 file
+                const base64File = response.data.archivoEncriptado;
+                console.log("PDF: " + base64File);
+
+                return res.status(200).json({
+                    NumGuia: getId,
+                    base64File: base64File,
+                    mensaje: mensaje
+                });
+            }
+        }
+
+        return res.status(200).json({
+            message: "Error al crear la orden en Servientrega.",
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+};
+
+export const CitiesServiEntrega = async (req, res) => {
+
+    const cities = `https://181.39.87.158:8021/api/ciudades/['lidenar.sa','lidenar']`;
+    const citiesAux = createAxiosInstance(cities);
+
+    const response = await citiesAux.get();
+
+    if (response.status === 200) {
+
+        const data = response.data;
+        console.log(data);
+
+        return res.status(200).json({
+            data: data
+        });
+    }
 
 }

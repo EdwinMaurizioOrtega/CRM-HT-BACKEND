@@ -6,7 +6,17 @@ import { createImei, getImeiByDescription } from '../controllers/ValidacionImei.
 
 //HT-BUSINESS
 import { getGarantia } from '../controllers/WebServicesRemote.js';
-import {deleteUser, getAllUsers, getUser, IniciarSesion, MyAccount, putUser, Registrarse} from '../controllers/user.js'
+import {
+    CitiesServiEntrega,
+    deleteUser,
+    getAllUsers,
+    getUser,
+    IniciarSesion,
+    MyAccount,
+    putUser,
+    Registrarse,
+    ServiEntrega
+} from '../controllers/user.js'
 
 
 //HT-BUSINESS HANA DB
@@ -109,6 +119,7 @@ router.post( "/api/orden_venta_sap", CreateInvoiceSAP)
 //Crear el número de factura, valor total, numero de guía, estado a facturado etc.
 router.put('/api/orders/order/facturar', putFacturar)
 
-
+router.post('/api/orders/order/ServiEntrega', ServiEntrega)
+router.get('/api/orders/order/ServiEntrega/ciudades', CitiesServiEntrega)
 
 export default router;

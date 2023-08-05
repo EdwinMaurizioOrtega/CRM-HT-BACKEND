@@ -7,7 +7,7 @@ export const getSearchCustomers = async (req, res) => {
     const query = req.query.query;
     console.log("Buscar: " + query)
 
-    const cleanQuery = `${query}`.toUpperCase().trim();
+    const cleanQuery = `${query}`.toUpperCase();
     //Creamos la consulta
     // const SqlQuery = 'SELECT *\n' +
     //     'FROM EC_SBO_LIDENAR.WEB_HT_PRODUCTOS\n' +
@@ -15,7 +15,7 @@ export const getSearchCustomers = async (req, res) => {
 
     const SqlQuery = `SELECT t.*
         FROM EC_SBO_LIDENAR.WEB_HT_CLIENTES t
-        WHERE "Cliente" LIKE '%${cleanQuery}%' AND "Tipo" IN ('Mayoristas', 'Aper')
+        WHERE UPPER("Cliente") LIKE '%${cleanQuery}%' AND "Tipo" IN ('Mayoristas', 'Aper')
         ORDER BY "Tipo" DESC`;
 
     //Funcion para enviar sentencias SQL a la DB HANA
