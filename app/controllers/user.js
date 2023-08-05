@@ -286,7 +286,7 @@ export const ServiEntrega = async (req, res) => {
             nombre_destinatario_ne: req.body.nombre_destinatario_ne,
             apellido_destinatar_ne: req.body.apellido_destinatar_ne,
             // MUY IMPORTANTE
-            direccion1_destinat_ne: 'Av. Colon 7-90 TEST TEST',
+            direccion1_destinat_ne: req.body.direccion1_destinat_ne,
             sector_destinat_ne: '',
             telefono1_destinat_ne: req.body.telefono1_destinat_ne,
             telefono2_destinat_ne: '',
@@ -319,7 +319,8 @@ export const ServiEntrega = async (req, res) => {
             ancho: 0,
             alto: 0,
             // El peso en nuestro caso es por bultos
-            peso_fisico: 0.0,
+            //EL PESO FÍSICO NO PUEDE SER MENOR QUE 1 KILOGRAMO
+            peso_fisico: 0.5,
             login_creacion: 'lidenar.sa',
             password: 'lidenar'
         };
@@ -328,6 +329,7 @@ export const ServiEntrega = async (req, res) => {
 
         // If the guia is created correctly with Status Code 201
         if (responseDos.status === 201) {
+            console.log("Body: " + responseDos.data);
             const getId = responseDos.data.id;
             console.log("Número de guia: " + getId);
 

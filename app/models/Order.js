@@ -130,7 +130,7 @@ export const ParamsOrder = (body, dateAll) => [
     body.NUMEROFACTURAHIPERTRONICS || '',
     body.NUMEROFACTURALIDENAR || '',
     body.NUMEROGUIA || '',
-    body.OBSERVACIONESB || '',
+    JSON.stringify(body.checkoutData.servientrega) || '',
     body.NOTACLIENTE || '',
     body.USUARIOAPROBO || '',
     body.PLANPAGOSTOMEBAMBA_ID || 0,
@@ -387,7 +387,8 @@ export const SqlGetOrderByIDAndAllStatus = (idOrder) => `SELECT T0.ID,
        T3.CITY,
        T1.GLN,
        T1."ValidComm",
-       T1."Balance"
+       T1."Balance",
+       T0.OBSERVACIONESB
 FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
          INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') AND T0.ID = ${idOrder}
          INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID`;
