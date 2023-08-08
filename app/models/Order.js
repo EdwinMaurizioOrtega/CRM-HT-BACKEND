@@ -317,7 +317,7 @@ export const SqlGetOrdersAllStatusByVendedor = (idVendedor) => `SELECT T0.ID,
        T3.CITY
 FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0 
          INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') AND T0.VENDEDORID = '${idVendedor}'
-         INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID ORDER BY TO_TIMESTAMP(T0.FECHACREACION, 'DD-MM-YYYY HH24:MI:SS') ASC`;
+         INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID ORDER BY TO_TIMESTAMP(T0.FECHACREACION, 'DD-MM-YYYY HH24:MI:SS') DESC`;
 
 //Bodega unicamente tiene acceso a los pedidos por facturar 0 y facturados 1
 export const SqlGetOrdersByWarehouses = (house) => `SELECT T0.ID,
