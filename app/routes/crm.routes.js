@@ -23,6 +23,7 @@ import {
 import { getSociosNegocio, getCondicionPago } from '../controllers/SociosDeNegocios.js';
 // Productos
 import {
+    CreateCatalogo,
     getAllProducts,
     getListPriceByCodeAndUser,
     getProduct,
@@ -121,5 +122,9 @@ router.put('/api/orders/order/facturar', putFacturar)
 
 router.post('/api/orders/order/ServiEntrega', ServiEntrega)
 router.get('/api/orders/order/ServiEntrega/ciudades', CitiesServiEntrega)
+
+//Consunta para generar el catálogo para los vendedores mayoristas
+router.post( "/api/catalogo", CreateCatalogo)
+
 
 export default router;
