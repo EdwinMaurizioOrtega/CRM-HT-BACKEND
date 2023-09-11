@@ -31,7 +31,7 @@ app.get('/', (req, res) => {
 
 //const CONNECTION_URL = 'mongodb://localhost:27017/memories';
 const CONNECTION_URL = 'mongodb+srv://hipertronics:81A00ydsLOOGibyK@cluster0.a70yomk.mongodb.net/crmht?retryWrites=true&w=majority';
-const PORT = process.env.PORT|| 80;
+const PORT = process.env.PORT|| 7070;
 
 mongoose.connect(CONNECTION_URL, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => app.listen(PORT, () => console.log(`Server Running on Port: http://localhost:${PORT}`)))
