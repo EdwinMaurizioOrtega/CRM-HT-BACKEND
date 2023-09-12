@@ -4,7 +4,9 @@ export const getAllProducts = async (req, res) => {
 
     //Sin Parametros
     //Creamos la consulta
-    const SqlQuery = `SELECT * FROM EC_SBO_LIDENAR.WEB_HT_PRODUCTOS WHERE STATUS = 'Y'`;
+    const SqlQuery = `SELECT *
+                      FROM EC_SBO_LIDENAR.WEB_HT_PRODUCTOS
+                      WHERE STATUS = 'Y'`;
 
     //Funcion para enviar sentencias SQL a la DB HANA
     consultas(SqlQuery, (err, result) => {
@@ -54,62 +56,65 @@ export const getStockProduct = async (req, res) => {
     console.log("Go " + code)
     //Creamos la consulta
     const SqlQuery = `WITH ListaWarehouse AS (SELECT '019' AS WH
-                        FROM DUMMY
-                        UNION ALL
-                        SELECT '002'
-                        FROM DUMMY
-                        UNION ALL
-                        SELECT '006'
-                        FROM DUMMY
-                        UNION ALL
-                        SELECT '015'
-                        FROM DUMMY
-                        UNION ALL
-                        SELECT '024'
-                        FROM DUMMY
-                        UNION ALL
-                        SELECT '009'
-                        FROM DUMMY
-                        UNION ALL
-                        SELECT '014'
-                        FROM DUMMY
-                        UNION ALL
-                        SELECT '001'
-                        FROM DUMMY
-                        UNION ALL
-                        SELECT '011'
-                        FROM DUMMY
-                        UNION ALL
-                        SELECT '016'
-                        FROM DUMMY
-                        UNION ALL
-                        SELECT '017'
-                        FROM DUMMY
-                        UNION ALL
-                        SELECT '020'
-                        FROM DUMMY
-                        UNION ALL
-                        SELECT '022'
-                        FROM DUMMY
-                        UNION ALL
-                        SELECT '003'
-                        FROM DUMMY)
-SELECT L.WH                                       AS "BODEGA",
-       COALESCE(T1."ItemCode", '${code}')        AS "CODIGO",
-       COALESCE(SUM(T1."InQty" - T1."OutQty"), 0) AS "CANTIDAD",
-       COALESCE(T5."RESERVADO", 0) AS "RESERVADO",
-        (COALESCE(SUM(T1."InQty" - T1."OutQty"), 0) - COALESCE(T5."RESERVADO", 0)) AS "DISPONIBLE"
+                                              FROM DUMMY
+                                              UNION ALL
+                                              SELECT '002'
+                                              FROM DUMMY
+                                              UNION ALL
+                                              SELECT '006'
+                                              FROM DUMMY
+                                              UNION ALL
+                                              SELECT '015'
+                                              FROM DUMMY
+                                              UNION ALL
+                                              SELECT '024'
+                                              FROM DUMMY
+                                              UNION ALL
+                                              SELECT '009'
+                                              FROM DUMMY
+                                              UNION ALL
+                                              SELECT '014'
+                                              FROM DUMMY
+                                              UNION ALL
+                                              SELECT '001'
+                                              FROM DUMMY
+                                              UNION ALL
+                                              SELECT '011'
+                                              FROM DUMMY
+                                              UNION ALL
+                                              SELECT '016'
+                                              FROM DUMMY
+                                              UNION ALL
+                                              SELECT '017'
+                                              FROM DUMMY
+                                              UNION ALL
+                                              SELECT '020'
+                                              FROM DUMMY
+                                              UNION ALL
+                                              SELECT '022'
+                                              FROM DUMMY
+                                              UNION ALL
+                                              SELECT '003'
+                                              FROM DUMMY)
+                      SELECT L.WH                                                                       AS "BODEGA",
+                             COALESCE(T1."ItemCode", '${code}')                                         AS "CODIGO",
+                             COALESCE(SUM(T1."InQty" - T1."OutQty"), 0)                                 AS "CANTIDAD",
+                             COALESCE(T5."RESERVADO", 0)                                                AS "RESERVADO",
+                             (COALESCE(SUM(T1."InQty" - T1."OutQty"), 0) - COALESCE(T5."RESERVADO", 0)) AS "DISPONIBLE"
 
-FROM ListaWarehouse L
-         LEFT JOIN
-    EC_SBO_LIDENAR.OINM T1 ON L.WH = T1."Warehouse" AND T1."ItemCode" LIKE '${code}'
-LEFT JOIN
-    (SELECT T4.PRODUCTO_ID, SUM(T4.CANTIDAD) AS "RESERVADO", T3.BODEGA
-    FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T3
-    INNER JOIN GRUPO_EMPRESARIAL_HT.HT_ORDERS_DETAIL T4 ON T4.ID_ORDER = T3.ID AND T3.ESTADO IN (6, 0) AND T4.PRODUCTO_ID LIKE '${code}'
-    GROUP BY T3.BODEGA, T4.PRODUCTO_ID) T5 ON T5.PRODUCTO_ID = COALESCE(T1."ItemCode", '${code}')
-AND T5.BODEGA = T1."Warehouse"
-GROUP BY L.WH, T1."ItemCode",T5."RESERVADO"`;
+                      FROM ListaWarehouse L
+                               LEFT JOIN
+                           EC_SBO_LIDENAR.OINM T1 ON L.WH = T1."Warehouse" AND T1."ItemCode" LIKE '${code}'
+                               LEFT JOIN
+                           (SELECT T4.PRODUCTO_ID, SUM(T4.CANTIDAD) AS "RESERVADO", T3.BODEGA
+                            FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T3
+                                     INNER JOIN GRUPO_EMPRESARIAL_HT.HT_ORDERS_DETAIL T4
+                                                ON T4.ID_ORDER = T3.ID AND T3.ESTADO IN (6, 0) AND
+                                                   T4.PRODUCTO_ID LIKE '${code}'
+                            GROUP BY T3.BODEGA, T4.PRODUCTO_ID) T5
+                           ON T5.PRODUCTO_ID = COALESCE(T1."ItemCode", '${code}')
+                               AND T5.BODEGA = T1."Warehouse"
+                      GROUP BY L.WH, T1."ItemCode", T5."RESERVADO"`;
 
     //Funcion para enviar sentencias SQL a la DB HANA
     consultas(SqlQuery, (err, result) => {
@@ -170,7 +175,7 @@ export const getListPriceByCodeAndUser = async (req, res) => {
     //Parametros
     const ItemCode = req.query.name;
     const IdUser = req.query.idUser;
-    console.log("ItemCode: " + ItemCode + " IdUser: "+IdUser)
+    console.log("ItemCode: " + ItemCode + " IdUser: " + IdUser)
 
     //Creamos la consulta de Datos Maestros Socios De Negocios
     //const SqlQuery = 'SELECT * FROM EC_SBO_LIDENAR.WEB_HT_PRECIOS T0 WHERE T0."ItemCode" = \'' + ItemCode + '\';';
@@ -197,7 +202,6 @@ export const getListPriceByCodeAndUser = async (req, res) => {
 }
 
 
-
 export const CreateCatalogo = async (req, res) => {
 
     //Lo que llega.
@@ -207,11 +211,10 @@ export const CreateCatalogo = async (req, res) => {
     const Marcas = req.body.multiSelectM;
 
     console.log("Bodegas: " + Bodegas);
-    // Convertir el array en una cadena SQL
-    const sqlQuery = Bodegas.map((bodega) => `SELECT '${bodega}' AS WH FROM DUMMY`).join('\nUNION ALL\n');
-    console.log(sqlQuery);
+    const sqlQueryBodegas = `'${Bodegas.join("', '")}'`;
+    console.log(sqlQueryBodegas);
 
-// Convierte el array en una cadena de valores separados por comas y comillas simples
+    // Convierte el array en una cadena de valores separados por comas y comillas simples
     const categoriasString = `'${Categorias.join("', '")}'`;
     console.log(categoriasString);
 
@@ -222,59 +225,48 @@ export const CreateCatalogo = async (req, res) => {
 
     try {
 
-        //Para revisar la sentencia ejem
-        // SELECT '019' AS WH
-        // FROM DUMMY
-        // UNION ALL
-        // SELECT '002'
-        // FROM DUMMY
-        // UNION ALL
-        // SELECT '006'
-        // FROM DUMMY
-        // UNION ALL
-        // SELECT '015'
-        // FROM DUMMY
-        // UNION ALL
-        // SELECT '024'
-        // FROM DUMMY
-
-        const SqlQuery = `WITH ListaWarehouse AS (${sqlQuery})
-
-SELECT T11.*, T12.*, T13."U_SYP_GRUPO" AS "MARCA", T13."ItmsGrpCod" AS "CATEGORIA", T13."validFor" AS "STATUS"
-FROM (SELECT "CODIGO",
-             "NOMBRE",
-             SUM("CANTIDAD") AS "CANTIDAD",
-             CASE
-                 WHEN SUM("CANTIDAD") BETWEEN 1 AND 9 THEN '+1' -- Alias: "+1"
-                 WHEN SUM("CANTIDAD") BETWEEN 10 AND 49 THEN '+10' -- Alias: "+10"
-                 WHEN SUM("CANTIDAD") > 50 THEN '+50' -- Alias: "+50"
-                 ELSE NULL -- Otra condición
-                 END         AS "CANTIDAD_ALIAS"
-      FROM (SELECT T1."ItemCode"       AS "CODIGO",
-                   T1."Dscription"                            AS "NOMBRE",
-                   COALESCE(SUM(T1."InQty" - T1."OutQty"), 0) AS "CANTIDAD"
-            FROM ListaWarehouse L
-                     LEFT JOIN EC_SBO_LIDENAR.OINM T1 ON L.WH = T1."Warehouse"
-            GROUP BY L.WH, T1."ItemCode", T1."Dscription") AS Subconsulta
-      GROUP BY "CODIGO", "NOMBRE") AS T11
-         INNER JOIN (SELECT Subconsulta.*
-                     FROM (SELECT T0."ItemCode",
-                                  T0."PriceList",
-                                  T1."ListName",
-                                  CAST(T0."Price" AS DECIMAL(18, 2)) AS "Price"
-                           FROM EC_SBO_LIDENAR.ITM1 T0
-                                    INNER JOIN EC_SBO_LIDENAR.OPLN T1
-                                               ON T1."ListNum" = T0."PriceList"
-                           UNION
-                           SELECT T2."ItemCode",
-                                  CAST(0 AS INTEGER)             AS "PriceList",
-                                  CAST('COSTO' AS NVARCHAR(255)) AS "ListName",
-                                  CAST(T2."AvgPrice" AS DECIMAL(18, 2)) AS "Price"
-                           FROM EC_SBO_LIDENAR.OITM T2
-                           ) AS Subconsulta
-                     WHERE Subconsulta."PriceList" = ${TipoPrecio}) AS T12 ON T11.CODIGO = T12."ItemCode"
-         INNER JOIN EC_SBO_LIDENAR.OITM AS T13 ON T12."ItemCode" = T13."ItemCode" AND T13."U_SYP_GRUPO" IN (${marcasString}) AND
-                                   T13."ItmsGrpCod" IN (${categoriasString}) AND T13."validFor" = 'Y' AND T11.CANTIDAD > 0`;
+        const SqlQuery = `SELECT T11.*,
+                                 T12.*,
+                                 T13."U_SYP_GRUPO" AS "MARCA",
+                                 T13."ItmsGrpCod"  AS "CATEGORIA",
+                                 T13."validFor"    AS "STATUS",
+                                 T13."ItemName"    AS "NOMBRE"
+                          FROM (SELECT "CODIGO",
+                                       SUM("CANTIDAD") AS "CANTIDAD",
+                                       CASE
+                                           WHEN SUM("CANTIDAD") BETWEEN 1 AND 9 THEN '+1' -- Alias: "+1"
+                                           WHEN SUM("CANTIDAD") BETWEEN 10 AND 49 THEN '+10' -- Alias: "+10"
+                                           WHEN SUM("CANTIDAD") > 50 THEN '+50' -- Alias: "+50"
+                                           ELSE NULL -- Otra condición
+                                           END         AS "CANTIDAD_ALIAS"
+                                FROM (SELECT T1."ItemCode"                              AS "CODIGO",
+                                             COALESCE(SUM(T1."InQty" - T1."OutQty"), 0) AS "CANTIDAD"
+                                      FROM EC_SBO_LIDENAR.OINM T1
+                                      WHERE T1."Warehouse" IN (${sqlQueryBodegas})
+                                      GROUP BY T1."ItemCode") AS Subconsulta
+                                GROUP BY "CODIGO") AS T11
+                                   INNER JOIN (SELECT Subconsulta.*
+                                               FROM (SELECT T0."ItemCode",
+                                                            T0."PriceList",
+                                                            T1."ListName",
+                                                            CAST(T0."Price" AS DECIMAL(18, 2)) AS "Price"
+                                                     FROM EC_SBO_LIDENAR.ITM1 T0
+                                                              INNER JOIN EC_SBO_LIDENAR.OPLN T1
+                                                                         ON T1."ListNum" = T0."PriceList"
+                                                     UNION
+                                                     SELECT T2."ItemCode",
+                                                            CAST(0 AS INTEGER)                    AS "PriceList",
+                                                            CAST('COSTO' AS NVARCHAR(255))        AS "ListName",
+                                                            CAST(T2."AvgPrice" AS DECIMAL(18, 2)) AS "Price"
+                                                     FROM EC_SBO_LIDENAR.OITM T2) AS Subconsulta
+                                               WHERE Subconsulta."PriceList" = ${TipoPrecio}) AS T12
+                                              ON T11.CODIGO = T12."ItemCode"
+                                   INNER JOIN EC_SBO_LIDENAR.OITM AS T13 ON T12."ItemCode" = T13."ItemCode" AND
+                                                                            T13."U_SYP_GRUPO" IN (${marcasString}) AND
+                                                                            T13."ItmsGrpCod" IN
+                                                                            (${categoriasString}) AND
+                                                                            T13."validFor" = 'Y' AND T11.CANTIDAD > 0
+                          ORDER BY T13."ItemName" ASC`;
 
         //Funcion para enviar sentencias SQL a la DB HANA
         consultas(SqlQuery, (err, result) => {
