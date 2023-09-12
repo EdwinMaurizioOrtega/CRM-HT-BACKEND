@@ -75,32 +75,34 @@ async function CrearOrdenServiceLayer(orden, detalle, usuario) {
     console.log(detalle);
     console.log(usuario);
 
-    const IdOrder = orden.ID;
-    //const CardCode = `CL${orden.CLIENTEID}`;
-    const CardCode = orden.CLIENTEID;
-    const PaymentGroupCode = orden.FORMADEPAGO;
-    const WarehouseCode = orden.BODEGA;
-
-    //Nombre usuario:
-    const displayname = usuario.DISPLAYNAME;
-
-
-    //Creacion de una orden en una base datos.
-
-    let the_token;
-
-    const the_url = 'https://192.168.0.154:50000/b1s/v1/Login';
-    const requestBody = {
-        CompanyDB: 'EC_SBO_LIDENAR',
-        Password: '1234',
-        UserName: 'integracion'
-    };
-
-    const axiosConfig = {
-        httpsAgent: new https.Agent({rejectUnauthorized: false})
-    };
-
     try {
+
+        const IdOrder = orden.ID;
+        //const CardCode = `CL${orden.CLIENTEID}`;
+        const CardCode = orden.CLIENTEID;
+        const PaymentGroupCode = orden.FORMADEPAGO;
+        const WarehouseCode = orden.BODEGA;
+
+        //Nombre usuario:
+        const displayname = usuario.DISPLAYNAME;
+
+
+        //Creacion de una orden en una base datos.
+
+        let the_token;
+
+        const the_url = 'https://192.168.0.154:50000/b1s/v1/Login';
+        const requestBody = {
+            CompanyDB: 'EC_SBO_LIDENAR',
+            Password: '1234',
+            UserName: 'integracion'
+        };
+
+        const axiosConfig = {
+            httpsAgent: new https.Agent({rejectUnauthorized: false})
+        };
+
+
         //Obtenemos el TOKEN
         const response = await axios.post(the_url, requestBody, axiosConfig);
         const data = response.data;
@@ -203,11 +205,11 @@ async function CrearOrdenServiceLayer(orden, detalle, usuario) {
                                     // Parametro name corresponde a codigo
                                     // Sentecia consultar el usuario
                                     const SqlQuery = `UPDATE GRUPO_EMPRESARIAL_HT.HT_ORDERS t
-                                    SET t.ESTADO        = 0,
-                                    t.USUARIOAPROBO = '${displayname}',
-                                    t.FECHAAPROBO   = '${dateAll}',
-                                    t.DOCNUM        = ${docNumSAP}
-                                    WHERE t.ID = ${IdOrder}`;
+                                                      SET t.ESTADO        = 0,
+                                                          t.USUARIOAPROBO = '${displayname}',
+                                                          t.FECHAAPROBO   = '${dateAll}',
+                                                          t.DOCNUM        = ${docNumSAP}
+                                                      WHERE t.ID = ${IdOrder}`;
 
                                     // //Funcion para enviar sentencias SQL a la DB HANA
                                     consultas(SqlQuery, async (err, result) => {
