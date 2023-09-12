@@ -8,13 +8,14 @@ import {consultas} from "../config/HANADB.js";
 const dateAll = format(new Date(), 'yyyy-MM-dd');
 
 export const CreateInvoiceSAP = async (req, res) => {
-    //Lo que llega.
-    const ID_ORDER = req.body.ID_ORDER;
-    const ID_USER = req.body.ID_USER;
-    console.log("Número de orden: " + ID_ORDER);
 
+    console.log("JSON Crear Orden SAP: " + req.body);
 
     try {
+        //Lo que llega.
+        const ID_ORDER = req.body.ID_ORDER;
+        const ID_USER = req.body.ID_USER;
+
         // Consultas:
         //Dettale de la orden -_-.
         const SqlQuery = SqlGetDetailOrder(ID_ORDER);
