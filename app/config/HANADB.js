@@ -8,11 +8,14 @@ import {
 } from "../models/Order.js";
 import createFormatDateTime from '../utils/dateFormatter.js';
 
+const dbHost = 'localhost';
+//const dbHost = '192.168.0.154';
+
 export function consultas(SqlQuery, callback) {
     console.log("Sentencia: " + SqlQuery);
 
     const connParams = {
-        serverNode: 'localhost:30015',
+        serverNode: `${dbHost}:30015`,
         uid: 'SYSTEM',
         pwd: 'B1Admin$'
     };
@@ -40,7 +43,7 @@ export function consultas(SqlQuery, callback) {
 export function insertOrder(body, callback) {
 
     const connParams = {
-        serverNode: 'localhost:30015',
+        serverNode: `${dbHost}:30015`,
         uid: 'SYSTEM',
         pwd: 'B1Admin$'
     };
