@@ -10,7 +10,7 @@ import {
     CitiesServiEntrega,
     deleteUser,
     getAllUsers,
-    getUser,
+    getUser, GuiasWeb,
     IniciarSesion,
     MyAccount,
     putUser,
@@ -120,8 +120,12 @@ router.post( "/api/orden_venta_sap", CreateInvoiceSAP)
 //Crear el número de factura, valor total, numero de guía, estado a facturado etc.
 router.put('/api/orders/order/facturar', putFacturar)
 
+//Crear una guia
 router.post('/api/orders/order/ServiEntrega', ServiEntrega)
+//Consultar las ciudades
 router.get('/api/orders/order/ServiEntrega/ciudades', CitiesServiEntrega)
+//Consultar una guia
+router.post('/api/orders/order/ServiEntrega/GuiasWeb', GuiasWeb)
 
 //Consunta para generar el catálogo para los vendedores mayoristas
 router.post( "/api/catalogo", CreateCatalogo)

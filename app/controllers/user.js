@@ -256,12 +256,21 @@ export const deleteUser = async (req, res) => {
 const createAxiosInstance = (baseURL) => {
     return axios.create({
         baseURL,
-        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+        httpsAgent: new https.Agent({rejectUnauthorized: false}),
         headers: {
             'Content-Type': 'application/json'
         }
     });
 };
+
+
+//AMBIENTE DE PRUEBAS
+const user = 'lidenar.sa';
+const pass = 'lidenar'
+
+//AMBIENTE PRODUCCIÓN
+// const user = 'LID.0106678568';
+// const pass = '@#2023Google'
 
 export const ServiEntrega = async (req, res) => {
     try {
@@ -289,7 +298,7 @@ export const ServiEntrega = async (req, res) => {
             direccion1_destinat_ne: req.body.direccion1_destinat_ne,
             sector_destinat_ne: '',
             telefono1_destinat_ne: req.body.telefono1_destinat_ne,
-            telefono2_destinat_ne: '',
+            telefono2_destinat_ne: req.body.telefono2_destinat_ne,
             codigo_postal_dest_ne: '',
             // Datos Remitente || BODEGA
             id_remitente_cl: req.body.id_remitente_cl,
@@ -325,7 +334,7 @@ export const ServiEntrega = async (req, res) => {
             password: 'lidenar'
         };
 
-        const responseDos = await orderClient.post('', dataToSend);
+        const responseDos = await orderClient.post('', dataToSend);2
 
         // If the guia is created correctly with Status Code 201
         if (responseDos.status === 201) {
@@ -333,7 +342,25 @@ export const ServiEntrega = async (req, res) => {
             const getId = responseDos.data.id;
             console.log("Número de guia: " + getId);
 
-            const businessPartnersUrl = `https://181.39.87.158:7777/api/GuiasWeb/['${getId}','lidenar.sa','lidenar','1']`;
+            //1.Guardamos la guia en al base de datos
+            const SqlQuery = `UPDATE GRUPO_EMPRESARIAL_HT.HT_ORDERS
+                              SET NUMEROGUIA = '${getId}'
+                              WHERE ID = ${req.body.num_pedido}`
+
+            // //Funcion para enviar sentencias SQL a la DB HANA
+            consultas(SqlQuery, async (err, result) => {
+                    if (err) {
+                        throw err
+                    } else {
+                        console.log("Número de guía guardada correctamente: " + result)
+                        //res.status(200);
+
+                    }
+                }
+            )
+
+            //2. Devolvemos la guía en la respuesta del JSON
+            const businessPartnersUrl = `https://181.39.87.158:7777/api/GuiasWeb/['${getId}','${user}','${pass}','1']`;
             const businessPartnerClient = createAxiosInstance(businessPartnersUrl);
 
             const response = await businessPartnerClient.get();
@@ -369,7 +396,7 @@ export const ServiEntrega = async (req, res) => {
 
 export const CitiesServiEntrega = async (req, res) => {
 
-    const cities = `https://181.39.87.158:8021/api/ciudades/['lidenar.sa','lidenar']`;
+    const cities = `https://181.39.87.158:8021/api/ciudades/['${user}','${pass}']`;
     const citiesAux = createAxiosInstance(cities);
 
     const response = await citiesAux.get();
@@ -385,3 +412,41 @@ export const CitiesServiEntrega = async (req, res) => {
     }
 
 }
+
+export const GuiasWeb = async (req, res) => {
+
+    try {
+
+        console.log("Body: " + req.body);
+        const getId = req.body.num_guia;
+        console.log("Número de guia: " + getId);
+
+        const businessPartnersUrl = `https://181.39.87.158:7777/api/GuiasWeb/['${getId}','${user}','${pass}','1']`;
+        const businessPartnerClient = createAxiosInstance(businessPartnersUrl);
+
+        const response = await businessPartnerClient.get();
+
+        // If the guia exists, obtain the PDF file
+        if (response.status === 201) {
+            // Impimir un mensaje
+            const mensaje = response.data.mensaje;
+            console.log(mensaje);
+            // Decode and save the base64 file
+            const base64File = response.data.archivoEncriptado;
+            console.log("PDF: " + base64File);
+
+            return res.status(200).json({
+                NumGuia: getId,
+                base64File: base64File,
+                mensaje: mensaje
+            });
+        }
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+};
