@@ -125,12 +125,9 @@ export const Registrarse = async (req, res) => {
                                         }
                                     }
                                 )
-
-
                             }
                         }
                     )
-
                 }
             }
         )
@@ -263,21 +260,32 @@ const createAxiosInstance = (baseURL) => {
     });
 };
 
-
-//AMBIENTE DE PRUEBAS
-const user = 'lidenar.sa';
-const pass = 'lidenar'
-
+const produccion = false;
+let user;
+let pass;
+if (produccion) {
 //AMBIENTE PRODUCCIÓN
-// const user = 'LID.0106678568';
-// const pass = '@#2023Google'
+    user = 'LID.0104504113';
+    pass = '12345';
+} else {
+    //AMBIENTE DE PRUEBAS
+    user = 'lidenar.sa';
+    pass = 'lidenar';
+}
 
 export const ServiEntrega = async (req, res) => {
     try {
         console.log(req.body);
 
-        // Create orden de venta in HANA SAP
-        const orderUrl = 'https://181.39.87.158:8021/api/guiawebs/';
+        let orderUrl;
+        if (produccion) {
+            //GENERACIO DE GUIAS (METODO POST)
+            orderUrl = 'https://swservicli.servientrega.com.ec:5052/api/guiawebs/';
+        } else {
+            // Create orden de venta in HANA SAP
+            orderUrl = 'https://181.39.87.158:8021/api/guiawebs/';
+        }
+
         const orderClient = createAxiosInstance(orderUrl);
 
         const dataToSend = {
@@ -330,11 +338,13 @@ export const ServiEntrega = async (req, res) => {
             // El peso en nuestro caso es por bultos
             //EL PESO FÍSICO NO PUEDE SER MENOR QUE 1 KILOGRAMO
             peso_fisico: 0.5,
-            login_creacion: 'lidenar.sa',
-            password: 'lidenar'
+            login_creacion: `${user}`,
+            password: `${pass}`
         };
 
-        const responseDos = await orderClient.post('', dataToSend);2
+        console.log(JSON.stringify(dataToSend));
+
+        const responseDos = await orderClient.post('', dataToSend);
 
         // If the guia is created correctly with Status Code 201
         if (responseDos.status === 201) {
@@ -359,8 +369,16 @@ export const ServiEntrega = async (req, res) => {
                 }
             )
 
-            //2. Devolvemos la guía en la respuesta del JSON
-            const businessPartnersUrl = `https://181.39.87.158:7777/api/GuiasWeb/['${getId}','${user}','${pass}','1']`;
+
+            let businessPartnersUrl
+            if (produccion) {
+                //GENERACION DE GUIA FORMATO A4 PDF (METODO GET)
+                businessPartnersUrl = `https://swservicli.servientrega.com.ec:5001/api/GuiasWeb/['${getId}','${user}','${pass}','1']`;
+            } else {
+                //2. Devolvemos la guía en la respuesta del JSON
+                businessPartnersUrl = `https://181.39.87.158:7777/api/GuiasWeb/['${getId}','${user}','${pass}','1']`;
+            }
+
             const businessPartnerClient = createAxiosInstance(businessPartnersUrl);
 
             const response = await businessPartnerClient.get();
@@ -396,7 +414,14 @@ export const ServiEntrega = async (req, res) => {
 
 export const CitiesServiEntrega = async (req, res) => {
 
-    const cities = `https://181.39.87.158:8021/api/ciudades/['${user}','${pass}']`;
+    let cities
+    if (produccion) {
+        //CONSULTA DE CIUDADES
+        cities = `https://swservicli.servientrega.com.ec:5052/api/ciudades/['${user}','${pass}']`;
+    } else {
+        cities = `https://181.39.87.158:8021/api/ciudades/['${user}','${pass}']`;
+    }
+
     const citiesAux = createAxiosInstance(cities);
 
     const response = await citiesAux.get();
@@ -421,7 +446,14 @@ export const GuiasWeb = async (req, res) => {
         const getId = req.body.num_guia;
         console.log("Número de guia: " + getId);
 
-        const businessPartnersUrl = `https://181.39.87.158:7777/api/GuiasWeb/['${getId}','${user}','${pass}','1']`;
+        let businessPartnersUrl;
+        if (produccion) {
+            //GENERACION DE GUIA FORMATO A4 PDF (METODO GET)
+            businessPartnersUrl = `https://swservicli.servientrega.com.ec:5001/api/GuiasWeb/['${getId}','${user}','${pass}','1']`;
+        } else {
+            businessPartnersUrl = `https://181.39.87.158:7777/api/GuiasWeb/['${getId}','${user}','${pass}','1']`;
+        }
+
         const businessPartnerClient = createAxiosInstance(businessPartnersUrl);
 
         const response = await businessPartnerClient.get();

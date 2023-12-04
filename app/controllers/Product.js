@@ -5,7 +5,7 @@ export const getAllProducts = async (req, res) => {
     //Sin Parametros
     //Creamos la consulta
     const SqlQuery = `SELECT *
-                      FROM EC_SBO_LIDENAR.WEB_HT_PRODUCTOS
+                      FROM GRUPO_EMPRESARIAL_HT.WEB_HT_PRODUCTOS
                       WHERE STATUS = 'Y'`;
 
     //Funcion para enviar sentencias SQL a la DB HANA
@@ -31,7 +31,7 @@ export const getProduct = async (req, res) => {
     console.log("Go " + name)
     //Creamos la consulta
     const SqlQuery = 'SELECT *\n' +
-        'FROM EC_SBO_LIDENAR.WEB_HT_PRODUCTOS\n' +
+        'FROM GRUPO_EMPRESARIAL_HT.WEB_HT_PRODUCTOS\n' +
         'where "CODIGO" = \'' + name + '\';';
 
     //Funcion para enviar sentencias SQL a la DB HANA
@@ -68,6 +68,9 @@ export const getStockProduct = async (req, res) => {
                                               FROM DUMMY
                                               UNION ALL
                                               SELECT '024'
+                                              FROM DUMMY
+                                              UNION ALL
+                                              SELECT '030'
                                               FROM DUMMY
                                               UNION ALL
                                               SELECT '009'
@@ -140,7 +143,7 @@ export const getSearchProducts = async (req, res) => {
     const cleanQuery = `${query}`.toUpperCase().trim();
     //Creamos la consulta
     const SqlQuery = 'SELECT *\n' +
-        'FROM EC_SBO_LIDENAR.WEB_HT_PRODUCTOS\n' +
+        'FROM GRUPO_EMPRESARIAL_HT.WEB_HT_PRODUCTOS\n' +
         'where "NOMBRE" LIKE \'%' + cleanQuery + '%\';';
 
     //Funcion para enviar sentencias SQL a la DB HANA
@@ -178,10 +181,10 @@ export const getListPriceByCodeAndUser = async (req, res) => {
     console.log("ItemCode: " + ItemCode + " IdUser: " + IdUser)
 
     //Creamos la consulta de Datos Maestros Socios De Negocios
-    //const SqlQuery = 'SELECT * FROM EC_SBO_LIDENAR.WEB_HT_PRECIOS T0 WHERE T0."ItemCode" = \'' + ItemCode + '\';';
+    //const SqlQuery = 'SELECT * FROM GRUPO_EMPRESARIAL_HT.WEB_HT_PRECIOS T0 WHERE T0."ItemCode" = \'' + ItemCode + '\';';
 
     const SqlQuery = 'SELECT *\n' +
-        'FROM EC_SBO_LIDENAR.WEB_HT_PRECIOS T0\n' +
+        'FROM GRUPO_EMPRESARIAL_HT.WEB_HT_PRECIOS T0\n' +
         '         INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USER_PRICE T1 ON T1.PRICE = T0."PriceList"\n' +
         'AND T0."ItemCode" = \'' + ItemCode + '\' AND T1.USER = \'' + IdUser + '\';'
 

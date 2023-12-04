@@ -5,7 +5,7 @@ import {SqlGetDetailOrder, SqlGetOrderByID, SqlGetUser} from "../models/Order.js
 import {consultas} from "../config/HANADB.js";
 
 
-const dateAll = format(new Date(), 'yyyy-MM-dd');
+const dateAll = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
 
 export const CreateInvoiceSAP = async (req, res) => {
 
@@ -257,12 +257,10 @@ async function CrearOrdenServiceLayer(orden, detalle, usuario) {
                             }
                         })
                         .catch(error => {
-                            console.error(error);
+                            console.error("Error SAP: "+ JSON.stringify(error.response.data));
                         });
 
-
                 }
-
 
                 if (statusBusinessPartners === 400 || statusBusinessPartners === 404) {
                     const dataBusinessPartners = response.data;

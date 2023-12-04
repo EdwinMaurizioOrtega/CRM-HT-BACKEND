@@ -10,11 +10,11 @@ export const getSearchCustomers = async (req, res) => {
     const cleanQuery = `${query}`.toUpperCase();
     //Creamos la consulta
     // const SqlQuery = 'SELECT *\n' +
-    //     'FROM EC_SBO_LIDENAR.WEB_HT_PRODUCTOS\n' +
+    //     'FROM GRUPO_EMPRESARIAL_HT.WEB_HT_PRODUCTOS\n' +
     //     'where "NOMBRE" LIKE \'%' + cleanQuery + '%\';';
 
     const SqlQuery = `SELECT t.*
-        FROM EC_SBO_LIDENAR.WEB_HT_CLIENTES t
+        FROM GRUPO_EMPRESARIAL_HT.WEB_HT_CLIENTES t
         WHERE UPPER("Cliente") LIKE '%${cleanQuery}%' AND "Tipo" IN ('Mayoristas', 'Aper')
         ORDER BY "Tipo" DESC`;
 

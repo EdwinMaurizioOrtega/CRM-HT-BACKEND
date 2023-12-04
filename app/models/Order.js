@@ -285,13 +285,15 @@ export const SqlGetAllOrders = (status) => `SELECT T0.ID,
        T0.VENDEDOR,
        T3.CITY
 FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
-         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') AND T0.ESTADO = ${status}
+         INNER JOIN GRUPO_EMPRESARIAL_HT.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') AND T0.ESTADO = ${status}
          INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID`;
 
 //Obtener lista de ordenes para el área de crédito
 export const SqlGetAllOrdersRoleCredit = () => `SELECT T0.ID,
        T0.ESTADO,
        T0.FECHACREACION,
+        T0.FECHAAPROBO,
+        T0.FECHAFACTURACION,
        T0.CLIENTEID,
        T1."Nombres",
        T1."Cliente",
@@ -304,7 +306,7 @@ export const SqlGetAllOrdersRoleCredit = () => `SELECT T0.ID,
        T0.FORMADEPAGO,
         T0.NUMEROGUIA
 FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
-         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') AND T0.ESTADO IN (6, 0, 1, 8)
+         INNER JOIN GRUPO_EMPRESARIAL_HT.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') AND T0.ESTADO IN (6, 0, 1, 8)
          INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID ORDER BY TO_TIMESTAMP(T0.FECHACREACION, 'DD-MM-YYYY HH24:MI:SS') ASC`;
 
 export const SqlGetOrdersAllStatusByVendedor = (idVendedor) => `SELECT T0.ID,
@@ -322,7 +324,7 @@ export const SqlGetOrdersAllStatusByVendedor = (idVendedor) => `SELECT T0.ID,
         T0.FORMADEPAGO,
         T0.NUMEROGUIA
 FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0 
-         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') AND T0.VENDEDORID = '${idVendedor}'
+         INNER JOIN GRUPO_EMPRESARIAL_HT.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') AND T0.VENDEDORID = '${idVendedor}'
          INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID ORDER BY TO_TIMESTAMP(T0.FECHACREACION, 'DD-MM-YYYY HH24:MI:SS') DESC`;
 
 //Bodega unicamente tiene acceso a los pedidos por facturar 0 y facturados 1
@@ -342,7 +344,7 @@ export const SqlGetOrdersByWarehouses = (house) => `SELECT T0.ID,
         T0.FORMADEPAGO,
         T0.NUMEROGUIA
 FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
-         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') 
+         INNER JOIN GRUPO_EMPRESARIAL_HT.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') 
          INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID AND T0.BODEGA = '${house}' AND T0.ESTADO IN ( 0, 1) ORDER BY TO_TIMESTAMP(T0.FECHACREACION, 'DD-MM-YYYY HH24:MI:SS') ASC`;
 
 export const SqlGetDetailOrder = (idOrder) => `select T0.ID,
@@ -356,7 +358,7 @@ export const SqlGetDetailOrder = (idOrder) => `select T0.ID,
        T0.TOTAL,
        T0.ID_ORDER
 from GRUPO_EMPRESARIAL_HT.HT_ORDERS_DETAIL T0
-         LEFT JOIN EC_SBO_LIDENAR.WEB_HT_PRODUCTOS T1 ON T1.CODIGO = T0.PRODUCTO_ID
+         LEFT JOIN GRUPO_EMPRESARIAL_HT.WEB_HT_PRODUCTOS T1 ON T1.CODIGO = T0.PRODUCTO_ID
 where ID_ORDER = ${idOrder}`;
 
 export const SqlGetOrderByID = (idOrder) => `SELECT T0.ID,
@@ -373,7 +375,7 @@ export const SqlGetOrderByID = (idOrder) => `SELECT T0.ID,
        T0.FORMADEPAGO,
        T3.CITY
 FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
-         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') AND T0.ESTADO = 6 AND T0.ID = ${idOrder}
+         INNER JOIN GRUPO_EMPRESARIAL_HT.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') AND T0.ESTADO = 6 AND T0.ID = ${idOrder}
          INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID`;
 
 
@@ -399,5 +401,5 @@ export const SqlGetOrderByIDAndAllStatus = (idOrder) => `SELECT T0.ID,
        T1."Balance",
        T0.OBSERVACIONESB
 FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
-         INNER JOIN EC_SBO_LIDENAR.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') AND T0.ID = ${idOrder}
+         INNER JOIN GRUPO_EMPRESARIAL_HT.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') AND T0.ID = ${idOrder}
          INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID`;
