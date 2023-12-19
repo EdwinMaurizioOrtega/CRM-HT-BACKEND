@@ -75,7 +75,8 @@ export const getGarantia = async (req, res) => {
 
     //PAC
     console.log("Buscando en el sistema Facturacion PAC")
-    const responsePac = await fetch("http://191.100.22.203:3001/st/buscarimei/", {
+    //const responsePac = await fetch("http://191.100.22.203:3001/st/buscarimei/", {
+    const responsePac = await fetch("http://10.1.10.201:8087/st/buscarimei/", {
         method: "POST", headers: {
             "Content-Type": "application/json", "Accept": "application/json",
         }, body: JSON.stringify({
@@ -98,7 +99,8 @@ export const getGarantia = async (req, res) => {
         //     method: "GET"
         // }).then(response => response.json())
 
-        const responseSap = await fetch(`http://191.100.22.203:3001/sap/imeifiltro/`, {
+        //const responseSap = await fetch(`http://191.100.22.203:3001/sap/imeifiltro/`, {
+        const responseSap = await fetch(`http://10.1.10.201:8087/sap/imeifiltro/`, {
             method: "POST", headers: {
                 "Content-Type": "application/json", "Accept": "application/json",
             }, body: JSON.stringify({

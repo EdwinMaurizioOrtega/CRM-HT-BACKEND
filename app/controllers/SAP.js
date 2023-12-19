@@ -5,7 +5,7 @@ import {SqlGetDetailOrder, SqlGetOrderByID, SqlGetUser} from "../models/Order.js
 import {consultas} from "../config/HANADB.js";
 
 
-const dateAll = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+
 
 export const CreateInvoiceSAP = async (req, res) => {
 
@@ -15,6 +15,7 @@ export const CreateInvoiceSAP = async (req, res) => {
         //Lo que llega.
         const ID_ORDER = req.body.ID_ORDER;
         const ID_USER = req.body.ID_USER;
+        const OBSERVACION_APROBACION = req.body.OBSERVACION_APROBACION
 
         // Consultas:
         //Dettale de la orden -_-.
@@ -48,7 +49,7 @@ export const CreateInvoiceSAP = async (req, res) => {
                 //Usuario
                 console.log(resultQueryUser[0])
 
-                let answer = CrearOrdenServiceLayer(resultQueryOrder[0], resultQuery, resultQueryUser[0])
+                let answer = CrearOrdenServiceLayer(resultQueryOrder[0], resultQuery, resultQueryUser[0], OBSERVACION_APROBACION)
 
                 res.status(200).json({answer: answer});
 
@@ -69,13 +70,16 @@ export const CreateInvoiceSAP = async (req, res) => {
 };
 
 
-async function CrearOrdenServiceLayer(orden, detalle, usuario) {
+async function CrearOrdenServiceLayer(orden, detalle, usuario, OBSERVACION_APROBACION) {
 
     console.log(orden);
     console.log(detalle);
     console.log(usuario);
+    console.log(OBSERVACION_APROBACION);
 
     try {
+
+        const dateAll = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
 
         const IdOrder = orden.ID;
         //const CardCode = `CL${orden.CLIENTEID}`;
@@ -208,6 +212,7 @@ async function CrearOrdenServiceLayer(orden, detalle, usuario) {
                                                       SET t.ESTADO        = 0,
                                                           t.USUARIOAPROBO = '${displayname}',
                                                           t.FECHAAPROBO   = '${dateAll}',
+                                                          t.OBSERVACIONES   = '${OBSERVACION_APROBACION}',
                                                           t.DOCNUM        = ${docNumSAP}
                                                       WHERE t.ID = ${IdOrder}`;
 

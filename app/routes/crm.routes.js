@@ -42,7 +42,7 @@ import {
     putDetailOrderDelete,
     putDetailOrderDiscount,
     putDetailOrderPriceUnit,
-    putDetailOrderQuantity, putFacturar, putOrderAnular
+    putDetailOrderQuantity, putFacturar, putOrderAnular, putOrderImprimir, putOrderToBag
 } from "../controllers/Order.js";
 import {CreateInvoiceSAP} from "../controllers/SAP.js";
 
@@ -108,6 +108,9 @@ router.delete("/api/orders/order/detail/delete", putDetailOrderDelete )
 //HT-BUSINESS HANA DB | Anular una orden.
 router.put("/api/orders/order/anular", putOrderAnular )
 
+//RETORNAR -_-
+router.put("/api/orders/order/to_bag", putOrderToBag )
+
 // HT-BUSINESS HANA DB | Cambiar la bodega de una orden | Área de aprobacion de pedidos
 router.put("/api/orders/order/change_warehouse", putChangeWarehouse)
 
@@ -129,6 +132,9 @@ router.post('/api/orders/order/ServiEntrega/GuiasWeb', GuiasWeb)
 
 //Consunta para generar el catálogo para los vendedores mayoristas
 router.post( "/api/catalogo", CreateCatalogo)
+
+//HT-BUSINESS HANA DB | Imprimir Orden - Bodega.
+router.put("/api/orders/order/imprimir", putOrderImprimir )
 
 
 export default router;

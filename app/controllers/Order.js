@@ -372,11 +372,58 @@ export const putOrderAnular = async (req, res) => {
     try {
 
         //Parametro name corresponde a codigo
-        const { ID } = req.body.params;
-        console.log("idOrder: " + ID)
+        const { ID_ORDER } = req.body.params;
+        const { OBSERVACION_ANULACION } = req.body.params;
+        const { ID_USER } = req.body.params;
+        console.log("ID_ORDER: " + ID_ORDER)
+        console.log("OBSERVACION_ANULACION: " + OBSERVACION_ANULACION)
+        console.log("ID_USER: " + ID_USER)
+
+        const currentDate = new Date();
+        const dateAll = createFormatDateTime(currentDate);
 
         // //Sentecia consultar el usuario
-        const SqlQuery = `UPDATE GRUPO_EMPRESARIAL_HT.HT_ORDERS t SET t.ESTADO = 8 WHERE t.ID = ${ID}`;
+        const SqlQuery = `UPDATE GRUPO_EMPRESARIAL_HT.HT_ORDERS t 
+                                    SET t.ESTADO = 8, 
+                                    t.OBSERVACION_ANULACION = '${OBSERVACION_ANULACION}', 
+                                    t.USER_ANULACION = ${ID_USER}, 
+                                    t.FECHA_ANULACION = '${dateAll}' 
+                                    WHERE t.ID = ${ID_ORDER}`;
+
+        // //Funcion para enviar sentencias SQL a la DB HANA
+        consultas(SqlQuery, async (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result)
+                    res.status(200).json({ message: 'Orden actualizada correctamente.' });
+                }
+            }
+        )
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+}
+
+//Recuperar pedido cuando se encuentre en estado anulado.
+//Retornar pedido desde bodega a cartera
+export const putOrderToBag = async (req, res) => {
+
+    try {
+
+        //Parametro name corresponde a codigo
+        const { ID_ORDER } = req.body.params;
+        console.log("ID_ORDER: " + ID_ORDER)
+
+        // //Sentecia consultar el usuario
+        const SqlQuery = `UPDATE GRUPO_EMPRESARIAL_HT.HT_ORDERS t 
+                                    SET t.ESTADO = 6
+                                    WHERE t.ID = ${ID_ORDER}`;
 
         // //Funcion para enviar sentencias SQL a la DB HANA
         consultas(SqlQuery, async (err, result) => {
@@ -403,12 +450,17 @@ export const putChangeWarehouse = async (req, res) => {
     try {
 
         //Parametro que llegan en el body
-        const {ID_ORDER, NEW_WAREHOUSE} = req.body;
+        const {ID_ORDER, NEW_WAREHOUSE, ID_USER} = req.body;
         console.log("IdOrden: " + ID_ORDER)
+
+        const currentDate = new Date();
+        const dateAll = createFormatDateTime(currentDate);
 
         // //Sentecia actualizar orden
         const SqlQuery = `UPDATE GRUPO_EMPRESARIAL_HT.HT_ORDERS t
-                                SET t.BODEGA = ${NEW_WAREHOUSE}
+                                SET t.BODEGA = ${NEW_WAREHOUSE},
+                                 t.USER_CAMBIO_BODEGA = ${ID_USER},
+                                 t.FECHA_CAMBIO_BODEGA = '${dateAll}'
                                 WHERE t.ID = ${ID_ORDER};`;
 
         // //Funcion para enviar sentencias SQL a la DB HANA
@@ -493,6 +545,41 @@ export const putFacturar = async (req, res) => {
                     res.status(200).json({
                         message: 'Factura guardada correctamente.',
                     });
+                }
+            }
+        )
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Internal server error.',
+        });
+    }
+
+}
+
+//Imprimir orden bodega
+export const putOrderImprimir = async (req, res) => {
+
+    try {
+
+        //Parametro name corresponde a codigo
+        const { ID } = req.body.params;
+        console.log("idOrder: " + ID)
+
+        const currentDate = new Date();
+        const dateAll = createFormatDateTime(currentDate);
+
+        // //Sentecia consultar el usuario
+        const SqlQuery = `UPDATE GRUPO_EMPRESARIAL_HT.HT_ORDERS t SET t.FECHA_IMPRESION = '${dateAll}' WHERE t.ID = ${ID}`;
+
+        // //Funcion para enviar sentencias SQL a la DB HANA
+        consultas(SqlQuery, async (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result)
+                    res.status(200).json({ message: 'Orden impresa correctamente.' });
                 }
             }
         )
