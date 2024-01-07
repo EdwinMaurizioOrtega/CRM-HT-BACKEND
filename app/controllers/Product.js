@@ -1,4 +1,4 @@
-import {consultas} from "../config/HANADB.js";
+import {SinParametros} from "../config/HANADB.js";
 
 export const getAllProducts = async (req, res) => {
 
@@ -9,7 +9,7 @@ export const getAllProducts = async (req, res) => {
                       WHERE STATUS = 'Y'`;
 
     //Funcion para enviar sentencias SQL a la DB HANA
-    consultas(SqlQuery, (err, result) => {
+    SinParametros(SqlQuery, (err, result) => {
             if (err) {
                 throw err
             } else {
@@ -35,7 +35,7 @@ export const getProduct = async (req, res) => {
         'where "CODIGO" = \'' + name + '\';';
 
     //Funcion para enviar sentencias SQL a la DB HANA
-    consultas(SqlQuery, (err, result) => {
+    SinParametros(SqlQuery, (err, result) => {
             if (err) {
                 throw err
             } else {
@@ -120,7 +120,7 @@ export const getStockProduct = async (req, res) => {
                       GROUP BY L.WH, T1."ItemCode", T5."RESERVADO"`;
 
     //Funcion para enviar sentencias SQL a la DB HANA
-    consultas(SqlQuery, (err, result) => {
+    SinParametros(SqlQuery, (err, result) => {
             if (err) {
                 throw err
             } else {
@@ -147,7 +147,7 @@ export const getSearchProducts = async (req, res) => {
         'where "NOMBRE" LIKE \'%' + cleanQuery + '%\';';
 
     //Funcion para enviar sentencias SQL a la DB HANA
-    consultas(SqlQuery, (err, result) => {
+    SinParametros(SqlQuery, (err, result) => {
             // if (err) {
             //     throw err
             // } else {
@@ -189,7 +189,7 @@ export const getListPriceByCodeAndUser = async (req, res) => {
         'AND T0."ItemCode" = \'' + ItemCode + '\' AND T1.USER = \'' + IdUser + '\';'
 
     //Funcion para enviar sentencias SQL a la DB HANA
-    consultas(SqlQuery, (err, result) => {
+    SinParametros(SqlQuery, (err, result) => {
             if (err) {
                 throw err
             } else {
@@ -272,7 +272,7 @@ export const CreateCatalogo = async (req, res) => {
                           ORDER BY T13."ItemName" ASC`;
 
         //Funcion para enviar sentencias SQL a la DB HANA
-        consultas(SqlQuery, (err, result) => {
+        SinParametros(SqlQuery, (err, result) => {
                 if (err) {
                     throw err
                 } else {

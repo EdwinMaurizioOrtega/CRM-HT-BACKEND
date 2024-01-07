@@ -406,3 +406,24 @@ export const SqlGetOrderByIDAndAllStatus = (idOrder) => `SELECT T0.ID,
 FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS T0
          INNER JOIN GRUPO_EMPRESARIAL_HT.WEB_HT_CLIENTES T1 ON T0.CLIENTEID = T1.ID AND T1."Tipo" IN ('Mayoristas', 'Aper') AND T0.ID = ${idOrder}
          INNER JOIN GRUPO_EMPRESARIAL_HT.HT_USERS T3 ON T0.VENDEDORID = T3.ID`;
+
+
+
+export const SqlInsertManagement = () => {
+    return `insert into GRUPO_EMPRESARIAL_HT.HT_VISITA (COMENTARIO, ESTADO, FECHA_VISITA, FECHA_ACTUALIZACION, FECHA_CREACION,
+                                            LATITUD, LONGITUD,
+                                            MOTIVO, NUMERO_DIAS_REGRESO, OBSERVACIONES, USUARIO_ACTUALIZACION,
+                                            CLIENTE_ID, PEDIDO_ID,
+                                            USUARIO_ID)
+values (?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?)`
+};
+
+export const ParamsManagementForCreateOrder = (dateAll, CLIENTE_ID, VENDEDOR_ID) => [
+    'CRM PWA', 0, dateAll, null, dateAll, '0000000000', '0000000000',
+    'Pedido Nuevo desde CRM PWA',
+    0, null, null, CLIENTE_ID, null, VENDEDOR_ID];
+
+export const ParamsForManagement = (dateAll, CLIENTE_ID, VENDEDOR_ID, VISITA) => [
+    VISITA.comentario, 0, dateAll, null, dateAll, '0000000000', '0000000000',
+    VISITA.motivo,
+    VISITA.numeroDiasRegreso, null, null, CLIENTE_ID, null, VENDEDOR_ID];

@@ -1,4 +1,4 @@
-import {consultas} from '../config/HANADB.js'
+import {SinParametros} from '../config/HANADB.js'
 
 export const getSociosNegocio = async (req, res) => {
 
@@ -35,7 +35,7 @@ export const getSociosNegocio = async (req, res) => {
         'WHERE T5."CardCode" LIKE \''+cedularuc+'\'';
 
     //Funcion para enviar sentencias SQL a la DB HANA
-    consultas(SqlQuery, (err, result) => {
+    SinParametros(SqlQuery, (err, result) => {
             if (err) {
                 throw err
             } else {
@@ -55,7 +55,7 @@ export const getCondicionPago = async (req, res) => {
     const SqlQuery = 'SELECT T0.* FROM EC_SBO_LIDENAR.OCTG T0';
 
     //Funcion para enviar sentencias SQL a la DB HANA
-    consultas(SqlQuery, (err, result) => {
+    SinParametros(SqlQuery, (err, result) => {
             if (err) {
                 throw err
             } else {

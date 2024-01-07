@@ -2,7 +2,7 @@ import axios from "axios";
 import * as https from "https";
 import {format} from "date-fns";
 import {SqlGetDetailOrder, SqlGetOrderByID, SqlGetUser} from "../models/Order.js";
-import {consultas} from "../config/HANADB.js";
+import {SinParametros} from "../config/HANADB.js";
 
 
 
@@ -28,7 +28,7 @@ export const CreateInvoiceSAP = async (req, res) => {
 // Función para enviar sentencias SQL a la DB HANA
         const executeQuery = (query) => {
             return new Promise((resolve, reject) => {
-                consultas(query, (err, result) => {
+                SinParametros(query, (err, result) => {
                     if (err) {
                         reject(err);
                     } else {
@@ -217,7 +217,7 @@ async function CrearOrdenServiceLayer(orden, detalle, usuario, OBSERVACION_APROB
                                                       WHERE t.ID = ${IdOrder}`;
 
                                     // //Funcion para enviar sentencias SQL a la DB HANA
-                                    consultas(SqlQuery, async (err, result) => {
+                                    SinParametros(SqlQuery, async (err, result) => {
                                             if (err) {
                                                 throw err
                                             } else {

@@ -2,7 +2,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 
 import {SqlQuerySignIn, SqlInsertUser} from "../models/user.js"
-import {consultas} from "../config/HANADB.js";
+import {SinParametros} from "../config/HANADB.js";
 import axios from "axios";
 import * as https from "https";
 
@@ -20,7 +20,7 @@ export const IniciarSesion = async (req, res) => {
         const SqlQuery = SqlQuerySignIn(email);
 
         //Funcion para enviar sentencias SQL a la DB HANA
-        consultas(SqlQuery, async (err, result) => {
+        SinParametros(SqlQuery, async (err, result) => {
                 if (err) {
                     throw err
                 } else {
@@ -67,7 +67,7 @@ export const MyAccount = async (req, res) => {
         // const SqlQuery = SqlQuerySignIn(email);
         //
         // //Funcion para enviar sentencias SQL a la DB HANA
-        consultas(SqlQuery, async (err, result) => {
+        SinParametros(SqlQuery, async (err, result) => {
                 if (err) {
                     throw err
                 } else {
@@ -87,12 +87,58 @@ export const MyAccount = async (req, res) => {
     }
 };
 
+export const MyAccess = async (req, res) => {
+    //const {email, password} = req.body;
+
+    try {
+
+        const {authorization} = req.headers;
+
+        if (!authorization) {
+            return res.status(401).json({
+                message: 'Authorization token missing',
+            });
+        }
+
+        const accessToken = `${authorization}`.split(' ')[1];
+
+        const data = jwt.verify(accessToken, JWT_SECRET);
+
+        console.log("data: " + data);
+
+        const userId = typeof data === 'object' ? data?.id : '';
+
+        // //Sentecia consultar el usuario
+        const SqlQuery = 'SELECT * FROM "GRUPO_EMPRESARIAL_HT"."HT_WEB_ACCESS" WHERE "USER_ID" = ' + userId;
+        // const SqlQuery = SqlQuerySignIn(email);
+        //
+        // //Funcion para enviar sentencias SQL a la DB HANA
+        SinParametros(SqlQuery, async (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    console.log(result)
+
+                    const oldUser = await result;
+
+                    if (!oldUser) return res.status(401).json({message: "Invalid authorization token"});
+
+                    res.status(200).json({data: oldUser});
+                }
+            }
+        )
+
+    } catch (err) {
+        res.status(500).json({message: "Algo salió mal"});
+    }
+};
+
 export const Registrarse = async (req, res) => {
     try {
 
         //Validamos si el usuario existe con el correo
         const SqlQuery = SqlQuerySignIn(req.body.EMAIL);
-        consultas(SqlQuery, async (err, result) => {
+        SinParametros(SqlQuery, async (err, result) => {
                 if (err) {
                     throw err
                 } else {
@@ -106,7 +152,7 @@ export const Registrarse = async (req, res) => {
 
                     // Si no existe el usuario en la DB procedemos a crearlo
                     const SqlUserQuery = SqlInsertUser(req.body);
-                    consultas(SqlUserQuery, async (err, result) => {
+                    SinParametros(SqlUserQuery, async (err, result) => {
                             if (err) {
                                 throw err
                             } else {
@@ -115,7 +161,7 @@ export const Registrarse = async (req, res) => {
 
                                 //Una vez creado con sultamos nuevamente el usuario y enviamos los datos en el response
                                 const SqlQuery2 = SqlQuerySignIn(req.body.EMAIL);
-                                consultas(SqlQuery2, async (err, result) => {
+                                SinParametros(SqlQuery2, async (err, result) => {
                                         if (err) {
                                             throw err
                                         } else {
@@ -148,7 +194,7 @@ export const getAllUsers = async (req, res) => {
     const SqlQuery = 'SELECT * FROM GRUPO_EMPRESARIAL_HT.HT_USERS';
 
     //Funcion para enviar sentencias SQL a la DB HANA
-    consultas(SqlQuery, (err, result) => {
+    SinParametros(SqlQuery, (err, result) => {
             if (err) {
                 throw err
             } else {
@@ -173,7 +219,7 @@ export const getUser = async (req, res) => {
     const SqlQuery = 'SELECT * FROM "GRUPO_EMPRESARIAL_HT"."HT_USERS" WHERE "ID" = ' + userId;
 
     // //Funcion para enviar sentencias SQL a la DB HANA
-    consultas(SqlQuery, async (err, result) => {
+    SinParametros(SqlQuery, async (err, result) => {
             if (err) {
                 throw err
             } else {
@@ -213,7 +259,7 @@ export const putUser = async (req, res) => {
 
 
     // //Funcion para enviar sentencias SQL a la DB HANA
-    consultas(SqlQuery, async (err, result) => {
+    SinParametros(SqlQuery, async (err, result) => {
             if (err) {
                 throw err
             } else {
@@ -238,7 +284,7 @@ export const deleteUser = async (req, res) => {
 
 
     // //Funcion para enviar sentencias SQL a la DB HANA
-    consultas(SqlQuery, async (err, result) => {
+    SinParametros(SqlQuery, async (err, result) => {
             if (err) {
                 throw err
             } else {
@@ -358,7 +404,7 @@ export const ServiEntrega = async (req, res) => {
                               WHERE ID = ${req.body.num_pedido}`
 
             // //Funcion para enviar sentencias SQL a la DB HANA
-            consultas(SqlQuery, async (err, result) => {
+            SinParametros(SqlQuery, async (err, result) => {
                     if (err) {
                         throw err
                     } else {

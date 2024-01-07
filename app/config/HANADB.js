@@ -1,9 +1,9 @@
 import hana from '@sap/hana-client';
 import {
     ParamsDetailOrder,
-    ParamsEnvioDetailOrder,
+    ParamsEnvioDetailOrder, ParamsManagementForCreateOrder,
     ParamsOrder,
-    SqlInsertDetailOrder,
+    SqlInsertDetailOrder, SqlInsertManagement,
     SqlInsertOrder
 } from "../models/Order.js";
 import createFormatDateTime from '../utils/dateFormatter.js';
@@ -11,8 +11,9 @@ import createFormatDateTime from '../utils/dateFormatter.js';
 const dbHost = 'localhost';
 //const dbHost = '192.168.0.154';
 
-export function consultas(SqlQuery, callback) {
-    console.log("Sentencia: " + SqlQuery);
+//SIN PARÁMETROS
+export function SinParametros(SqlQuery, callback) {
+    console.log("Sentencia Sin Parametros: " + SqlQuery);
 
     const connParams = {
         serverNode: `${dbHost}:30015`,
@@ -40,6 +41,37 @@ export function consultas(SqlQuery, callback) {
     });
 }
 
+//CON PARÁMETROS
+export function ConParametros(SqlQuery, params, callback) {
+    console.log("Sentencia Con Parametros: " + SqlQuery);
+
+    const connParams = {
+        serverNode: `${dbHost}:30015`,
+        uid: 'SYSTEM',
+        pwd: 'B1Admin$'
+    };
+
+    const conn = hana.createConnection(connParams);
+
+    conn.connect((err) => {
+        if (err) {
+            callback(err);
+            return;
+        }
+
+        conn.exec(SqlQuery, params, (err, result) => {
+            if (err) {
+                callback(err);
+            } else {
+                callback(null, result);
+            }
+
+            conn.disconnect();
+        });
+    });
+}
+
+//Exclusivamente para crear las ordenes en la DB HANA
 export function insertOrder(body, callback) {
 
     const connParams = {
@@ -63,13 +95,16 @@ export function insertOrder(body, callback) {
         const currentDate = new Date();
         const dateAll = createFormatDateTime(currentDate);
 
+        // ORDEN
+        console.info("=============SECCION ORDEN=============")
+
         const sql = SqlInsertOrder();
         const params = ParamsOrder(body, dateAll);
 
         // Ejemplo de inserción de datos
         conn.exec(sql, params, (insertErr, affectedRows) => {
             if (insertErr) {
-                console.error('Error al insertar datos:', insertErr);
+                console.error('Error al insertar datos |ORDEN|: ', insertErr);
                 conn.disconnect();
                 return;
             }
@@ -79,7 +114,7 @@ export function insertOrder(body, callback) {
             // Consulta adicional para obtener la última ORDEN
             conn.exec(`SELECT U.* FROM GRUPO_EMPRESARIAL_HT.HT_ORDERS AS U JOIN (SELECT CURRENT_IDENTITY_VALUE() AS ID FROM DUMMY) AS I ON U.ID = I.ID`, (err, rows) => {
                 if (err) {
-                    console.error('Error al obtener la última ORDEN:', err);
+                    console.error('Error al obtener la última |ORDEN|: ', err);
                     conn.disconnect();
                     callback(err);
                     return;
@@ -88,6 +123,8 @@ export function insertOrder(body, callback) {
                 const lastIdOrder = rows[0].ID;
 
                 // DETALLE ORDEN
+                console.info("=============SECCION DETALLE ORDEN=============")
+
                 const cart = body.checkoutData.cart;
                 //let formaPago = body.checkoutData.method;
                 const lengthCart = cart.length;
@@ -108,7 +145,7 @@ export function insertOrder(body, callback) {
                     // Ejemplo de inserción de datos detalle orden
                     conn.exec(sqlDetalle, paramsDetalle, (insertErr, affectedRows) => {
                         if (insertErr) {
-                            console.error('Error al insertar datos:', insertErr);
+                            console.error('Error al insertar datos |DETALLE ORDEN|:', insertErr);
                             conn.disconnect();
                             callback(insertErr);
                             return;
@@ -173,7 +210,7 @@ export function insertOrder(body, callback) {
                 // Ejemplo de inserción de datos de envio
                 conn.exec(sqlEnvio, paramsEnvio, (insertErr, affectedRows) => {
                     if (insertErr) {
-                        console.error('Error al insertar datos:', insertErr);
+                        console.error('Error al insertar datos |ENVIO|: ', insertErr);
                         conn.disconnect();
                         callback(insertErr);
                         return;
@@ -182,9 +219,30 @@ export function insertOrder(body, callback) {
 
                 });
 
-
-
             });
         });
+
+        // //SECCION GESTIÓN
+        // console.info("=============SECCION GESTIÓN=============")
+        // const sqlManagement = SqlInsertManagement();
+        //
+        // //ID del cliente
+        // const CLIENTE_ID = body.checkoutData.billing.ID;
+        // //ID del vendedor
+        // const VENDEDOR_ID = body.checkoutUser.ID;
+        //
+        // const paramsManagement = ParamsManagementForCreateOrder(dateAll, CLIENTE_ID, VENDEDOR_ID);
+        //
+        // // Ejemplo de inserción de datos de envio
+        // conn.exec(sqlManagement, paramsManagement, (insertErr, affectedRows) => {
+        //     if (insertErr) {
+        //         console.error('Error al insertar datos |GESTIÓN|: ', insertErr);
+        //         conn.disconnect();
+        //         callback(insertErr);
+        //         return;
+        //     }
+        //     console.log('Filas afectadas por la inserción:', affectedRows);
+
+        // });
     });
 }

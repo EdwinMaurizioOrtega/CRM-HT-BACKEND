@@ -1,5 +1,5 @@
 import express from 'express';
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
 import cors from 'cors';
 
 import crmRoutes from './app/routes/crm.routes.js';
@@ -28,14 +28,17 @@ app.get('/', (req, res) => {
   res.send('APP IS RUNNING HIPERTRONICS.');
 })
 
-
 //const CONNECTION_URL = 'mongodb://localhost:27017/memories';
-const CONNECTION_URL = 'mongodb+srv://hipertronics:81A00ydsLOOGibyK@cluster0.a70yomk.mongodb.net/crmht?retryWrites=true&w=majority';
+//const CONNECTION_URL = 'mongodb+srv://hipertronics:81A00ydsLOOGibyK@cluster0.a70yomk.mongodb.net/crmht?retryWrites=true&w=majority';
 const PORT = process.env.PORT|| 7070;
 //const PORT = process.env.PORT|| 80;
 
-mongoose.connect(CONNECTION_URL, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => app.listen(PORT, () => console.log(`Server Running on Port: http://localhost:${PORT}`)))
-    .catch((error) => console.log(`${error} did not connect`));
+// mongoose.connect(CONNECTION_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+//     .then(() => app.listen(PORT, () => console.log(`Server Running on Port: http://localhost:${PORT}`)))
+//     .catch((error) => console.log(`${error} did not connect`));
 
-mongoose.set('useFindAndModify', false);
+// mongoose.set('useFindAndModify', false);
+
+app.listen(PORT, () => {
+  console.log(`Server Running on Port: http://localhost:${PORT}`);
+});

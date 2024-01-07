@@ -1,4 +1,4 @@
-import {consultas, insertOrder} from "../config/HANADB.js";
+import {SinParametros, insertOrder} from "../config/HANADB.js";
 import {
     SqlGetAllOrders, SqlGetAllOrdersRoleCredit,
     SqlGetDetailOrder,
@@ -18,6 +18,7 @@ export const CreateOrder = async (req, res) => {
         insertOrder(req.body, async (err, result) => {
                 if (err) {
                     throw err
+                    console.error("Some error occurred: "+err);
                 } else {
                     console.log(result);
                     res.status(201).send(result);
@@ -27,7 +28,7 @@ export const CreateOrder = async (req, res) => {
 
 
     } catch (error) {
-        console.error(error);
+        console.error("Some error occurred: "+error);
         return res.status(500).json({
             message: 'Internal server error.',
         });
@@ -46,7 +47,7 @@ export const getAllOrders = async (req, res) => {
         const SqlQuery = SqlGetAllOrders(estado)
 
         //Funcion para enviar sentencias SQL a la DB HANA
-        consultas(SqlQuery, (err, result) => {
+        SinParametros(SqlQuery, (err, result) => {
                 if (err) {
                     throw err
                 } else {
@@ -80,7 +81,7 @@ export const getAllOrdersRoleCredit = async (req, res) => {
         const SqlQuery = SqlGetAllOrdersRoleCredit()
 
         //Funcion para enviar sentencias SQL a la DB HANA
-        consultas(SqlQuery, (err, result) => {
+        SinParametros(SqlQuery, (err, result) => {
                 if (err) {
                     throw err
                 } else {
@@ -115,7 +116,7 @@ export const getOrdersAllStatusByVendedor = async (req, res) => {
         const SqlQuery = SqlGetOrdersAllStatusByVendedor(idVendedor);
 
         //Funcion para enviar sentencias SQL a la DB HANA
-        consultas(SqlQuery, (err, result) => {
+        SinParametros(SqlQuery, (err, result) => {
                 if (err) {
                     throw err
                 } else {
@@ -151,7 +152,7 @@ export const getOrdersByWarehouse = async (req, res) => {
         const SqlQuery = SqlGetOrdersByWarehouses(house);
 
         //Funcion para enviar sentencias SQL a la DB HANA
-        consultas(SqlQuery, (err, result) => {
+        SinParametros(SqlQuery, (err, result) => {
                 if (err) {
                     throw err
                 } else {
@@ -191,7 +192,7 @@ export const getDetailOrder = async (req, res) => {
 // Función para enviar sentencias SQL a la DB HANA
         const executeQuery = (query) => {
             return new Promise((resolve, reject) => {
-                consultas(query, (err, result) => {
+                SinParametros(query, (err, result) => {
                     if (err) {
                         reject(err);
                     } else {
@@ -245,7 +246,7 @@ export const putDetailOrderPriceUnit = async (req, res) => {
                                 WHERE t.ID = ${ID_DETALLE_ORDEN}`;
 
         // //Funcion para enviar sentencias SQL a la DB HANA
-        consultas(SqlQuery, async (err, result) => {
+        SinParametros(SqlQuery, async (err, result) => {
                 if (err) {
                     throw err
                 } else {
@@ -279,7 +280,7 @@ export const putDetailOrderQuantity = async (req, res) => {
                                 WHERE t.ID = ${ID_DETALLE_ORDEN}`;
 
         // //Funcion para enviar sentencias SQL a la DB HANA
-        consultas(SqlQuery, async (err, result) => {
+        SinParametros(SqlQuery, async (err, result) => {
                 if (err) {
                     throw err
                 } else {
@@ -313,7 +314,7 @@ export const putDetailOrderDiscount = async (req, res) => {
                                     WHERE t.ID = ${ID_DETALLE_ORDEN}`;
 
         // //Funcion para enviar sentencias SQL a la DB HANA
-        consultas(SqlQuery, async (err, result) => {
+        SinParametros(SqlQuery, async (err, result) => {
                 if (err) {
                     throw err
                 } else {
@@ -347,7 +348,7 @@ export const putDetailOrderDelete = async (req, res) => {
                                 WHERE ID = ${id}`;
 
         // //Funcion para enviar sentencias SQL a la DB HANA
-        consultas(SqlQuery, async (err, result) => {
+        SinParametros(SqlQuery, async (err, result) => {
                 if (err) {
                     throw err
                 } else {
@@ -372,9 +373,7 @@ export const putOrderAnular = async (req, res) => {
     try {
 
         //Parametro name corresponde a codigo
-        const { ID_ORDER } = req.body.params;
-        const { OBSERVACION_ANULACION } = req.body.params;
-        const { ID_USER } = req.body.params;
+        const { ID_ORDER, OBSERVACION_ANULACION, ID_USER } = req.body.params;
         console.log("ID_ORDER: " + ID_ORDER)
         console.log("OBSERVACION_ANULACION: " + OBSERVACION_ANULACION)
         console.log("ID_USER: " + ID_USER)
@@ -382,7 +381,7 @@ export const putOrderAnular = async (req, res) => {
         const currentDate = new Date();
         const dateAll = createFormatDateTime(currentDate);
 
-        // //Sentecia consultar el usuario
+        //Sentecia consultar el usuario
         const SqlQuery = `UPDATE GRUPO_EMPRESARIAL_HT.HT_ORDERS t 
                                     SET t.ESTADO = 8, 
                                     t.OBSERVACION_ANULACION = '${OBSERVACION_ANULACION}', 
@@ -390,8 +389,10 @@ export const putOrderAnular = async (req, res) => {
                                     t.FECHA_ANULACION = '${dateAll}' 
                                     WHERE t.ID = ${ID_ORDER}`;
 
-        // //Funcion para enviar sentencias SQL a la DB HANA
-        consultas(SqlQuery, async (err, result) => {
+        console.log("Anular SqlQuery: "+ SqlQuery);
+
+        //Funcion para enviar sentencias SQL a la DB HANA
+        SinParametros(SqlQuery, async (err, result) => {
                 if (err) {
                     throw err
                 } else {
@@ -426,7 +427,7 @@ export const putOrderToBag = async (req, res) => {
                                     WHERE t.ID = ${ID_ORDER}`;
 
         // //Funcion para enviar sentencias SQL a la DB HANA
-        consultas(SqlQuery, async (err, result) => {
+        SinParametros(SqlQuery, async (err, result) => {
                 if (err) {
                     throw err
                 } else {
@@ -464,7 +465,7 @@ export const putChangeWarehouse = async (req, res) => {
                                 WHERE t.ID = ${ID_ORDER};`;
 
         // //Funcion para enviar sentencias SQL a la DB HANA
-        consultas(SqlQuery, async (err, result) => {
+        SinParametros(SqlQuery, async (err, result) => {
                 if (err) {
                     throw err
                 } else {
@@ -498,7 +499,7 @@ export const putChangePayment = async (req, res) => {
                                     WHERE t.ID = ${ID_ORDER};`;
 
         // //Funcion para enviar sentencias SQL a la DB HANA
-        consultas(SqlQuery, async (err, result) => {
+        SinParametros(SqlQuery, async (err, result) => {
                 if (err) {
                     throw err
                 } else {
@@ -537,7 +538,7 @@ export const putFacturar = async (req, res) => {
                                 WHERE t.ID = ${ID_ORDER}`;
 
         // //Funcion para enviar sentencias SQL a la DB HANA
-        consultas(SqlQuery, async (err, result) => {
+        SinParametros(SqlQuery, async (err, result) => {
                 if (err) {
                     throw err
                 } else {
@@ -574,7 +575,7 @@ export const putOrderImprimir = async (req, res) => {
         const SqlQuery = `UPDATE GRUPO_EMPRESARIAL_HT.HT_ORDERS t SET t.FECHA_IMPRESION = '${dateAll}' WHERE t.ID = ${ID}`;
 
         // //Funcion para enviar sentencias SQL a la DB HANA
-        consultas(SqlQuery, async (err, result) => {
+        SinParametros(SqlQuery, async (err, result) => {
                 if (err) {
                     throw err
                 } else {

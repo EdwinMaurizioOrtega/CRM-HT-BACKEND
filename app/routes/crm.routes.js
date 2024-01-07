@@ -11,7 +11,7 @@ import {
     deleteUser,
     getAllUsers,
     getUser, GuiasWeb,
-    IniciarSesion,
+    IniciarSesion, MyAccess,
     MyAccount,
     putUser,
     Registrarse,
@@ -31,7 +31,13 @@ import {
     getStockProduct
 } from '../controllers/Product.js'
 // Clientes
-import {getSearchCustomers} from "../controllers/Customer.js";
+import {
+    ByRucCI,
+    CreateManagement,
+    getBusinessPartners,
+    getBusinessPartnersByRange,
+    getSearchCustomers, OrdersList, VisitList
+} from "../controllers/Customer.js";
 import {
     CreateOrder,
     getAllOrders, getAllOrdersRoleCredit,
@@ -60,6 +66,7 @@ router.get('/garantia_imei_pac_sap', getGarantia);
 //HT-BUSINESS HANA DB | Auth
 router.post("/api/account/login", IniciarSesion);
 router.get("/api/account/my-account", MyAccount);
+router.get("/api/account/my-access", MyAccess);
 router.post("/api/account/register", Registrarse);
 router.get("/api/users", getAllUsers)
 router.get("/api/users/user", getUser)
@@ -85,6 +92,8 @@ router.get('/condicion_pago', getCondicionPago)
 
 //HT-BUSINESS HANA DB | Buscar Clientes por el nombre - Razon Social
 router.get('/api/customers/search', getSearchCustomers)
+router.get('/api/BusinessPartners', getBusinessPartners)
+router.post('/api/BusinessPartnersByRange', getBusinessPartnersByRange)
 
 //HT-BUSINESS HANA DB | Create Order
 router.post("/api/orders/order", CreateOrder);
@@ -134,7 +143,12 @@ router.post('/api/orders/order/ServiEntrega/GuiasWeb', GuiasWeb)
 router.post( "/api/catalogo", CreateCatalogo)
 
 //HT-BUSINESS HANA DB | Imprimir Orden - Bodega.
-router.put("/api/orders/order/imprimir", putOrderImprimir )
+router.put("/api/orders/order/imprimir", putOrderImprimir)
+
+router.post('/api/BusinessPartners/management', CreateManagement)
+router.post('/api/BusinessPartners/VisitList', VisitList)
+router.post('/api/BusinessPartners/OrdersList', OrdersList)
+router.post('/api/BusinessPartners/ByRucCI', ByRucCI)
 
 
 export default router;
