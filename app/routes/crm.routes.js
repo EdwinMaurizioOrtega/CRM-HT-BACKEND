@@ -74,7 +74,7 @@ router.put("/api/users/user", putUser)
 router.delete("/api/users/user", deleteUser)
 
 //HT-BUSINESS HANA DB | Productos
-router.get('/api/products', getAllProducts)
+router.get('/api/products/', getAllProducts)
 //HT-BUSINESS HANA DB | Producto por código
 router.get('/api/products/product', getProduct)
 //HT-BUSINESS HANA DB | Buscar Productos por nombre
